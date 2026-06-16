@@ -16,10 +16,12 @@ var game_state: Dictionary = {
 		"deploy_location": "",
 	},
 	"equipment": {
-		"weapon": null,
-		"helmet": null,
-		"armor": null,
-		"backpack": null,
+		"weapon": {
+			"type_id": "mp5",
+			"name": "MP5",
+			"condition": 100.0,
+			"mods": {},
+		},
 	},
 	"inventory": [],
 	"rubles": 5000,

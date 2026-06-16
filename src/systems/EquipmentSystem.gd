@@ -1,26 +1,12 @@
 extends Node
 
-const WEIGHT_WEAPON = 0.50
-const WEIGHT_ARMOR  = 0.30
-const WEIGHT_MISC   = 0.20
-const DEGRADE_BASE  = 0.04  # 4% per raid at zero danger
+const DEGRADE_BASE = 0.04  # 4% per raid at zero danger
 
 func calculate_efficiency(equipment: Dictionary) -> float:
-	var weapon_cond = _slot_condition(equipment.get("weapon"))
-	var armor_cond  = _slot_condition(equipment.get("armor"))
-	var misc_cond = (
-		_slot_condition(equipment.get("helmet")) +
-		_slot_condition(equipment.get("backpack"))
-	) / 2.0
-
-	var base = (
-		weapon_cond * WEIGHT_WEAPON +
-		armor_cond  * WEIGHT_ARMOR  +
-		misc_cond   * WEIGHT_MISC
-	)
-
-	var mod_bonus = GunModSystem.calculate_efficiency_bonus(equipment.get("weapon"))
-	return clampf(base + mod_bonus, 0.05, 2.0)
+	# Weapon condition (0.0–1.0) + mod bonus (0.0–0.5) = max 1.5
+	var weapon_cond := _slot_condition(equipment.get("weapon"))
+	var mod_bonus   := GunModSystem.calculate_efficiency_bonus(equipment.get("weapon"))
+	return clampf(weapon_cond + mod_bonus, 0.05, 1.5)
 
 func degrade_equipment_after_raid(equipment: Dictionary, danger_factor: float) -> void:
 	var deg = DEGRADE_BASE * (1.0 + danger_factor)

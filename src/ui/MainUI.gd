@@ -100,7 +100,7 @@ func _add_equipment_panel(parent: Control) -> void:
 	p.add_child(vbox)
 	vbox.add_child(_label("EQUIPMENT", C_ACCENT, 11))
 
-	for slot in ["weapon", "armor", "helmet", "backpack"]:
+	for slot in ["weapon"]:
 		var row = HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
 		vbox.add_child(row)
