@@ -100,35 +100,22 @@ func _add_equipment_panel(parent: Control) -> void:
 	p.add_child(vbox)
 	vbox.add_child(_label("EQUIPMENT", C_ACCENT, 11))
 
-	for slot in ["weapon"]:
-		var row = HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
-		vbox.add_child(row)
+	var weapon_row = HBoxContainer.new()
+	weapon_row.add_theme_constant_override("separation", 8)
+	vbox.add_child(weapon_row)
 
-		var lbl = _label(slot.to_upper(), C_DIM, 10)
-		lbl.custom_minimum_size.x = 70
-		row.add_child(lbl)
+	weapon_row.add_child(_label("WEAPON", C_DIM, 10))
 
-		var bar = ProgressBar.new()
-		bar.min_value = 0
-		bar.max_value = 100
-		bar.value = 0
-		bar.show_percentage = false
-		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		bar.custom_minimum_size.y = 16
-		row.add_child(bar)
+	var weapon_name_lbl = _label("--", C_TEXT, 10)
+	weapon_name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	weapon_row.add_child(weapon_name_lbl)
+	# Condition bar removed — restore by adding ProgressBar + condition label here
+	_equip_bars["weapon"] = {"name_lbl": weapon_name_lbl}
 
-		var cond_lbl = _label("--", C_DIM, 10)
-		cond_lbl.custom_minimum_size.x = 55
-		row.add_child(cond_lbl)
-
-		_equip_bars[slot] = {"bar": bar, "label": cond_lbl}
-
-		if slot == "weapon":
-			var mod_btn = _button("MOD", C_BORDER)
-			mod_btn.custom_minimum_size.x = 40
-			mod_btn.pressed.connect(_on_gun_mod_pressed)
-			row.add_child(mod_btn)
+	var mod_btn = _button("MOD", C_BORDER)
+	mod_btn.custom_minimum_size.x = 40
+	mod_btn.pressed.connect(_on_gun_mod_pressed)
+	weapon_row.add_child(mod_btn)
 
 func _add_location_panel(parent: Control) -> void:
 	var p = _panel(parent)
@@ -323,20 +310,15 @@ func _refresh_all() -> void:
 	_refresh_inventory()
 
 func _refresh_equipment() -> void:
-	var equip = GameManager.game_state.equipment
-	for slot in _equip_bars:
-		var item = equip.get(slot)
-		var bar: ProgressBar = _equip_bars[slot]["bar"]
-		var lbl: Label       = _equip_bars[slot]["label"]
-		if item == null:
-			bar.value = 0
-			lbl.text = "EMPTY"
-			lbl.add_theme_color_override("font_color", C_DIM)
-		else:
-			var cond: float = item.get("condition", 100.0)
-			bar.value = cond
-			lbl.text = EquipmentSystem.get_condition_label(cond)
-			lbl.add_theme_color_override("font_color", EquipmentSystem.get_condition_color(cond))
+	var weapon = GameManager.game_state.equipment.get("weapon")
+	var name_lbl: Label = _equip_bars["weapon"]["name_lbl"]
+	# Condition display removed — restore by reading weapon.get("condition") here
+	if weapon == null:
+		name_lbl.text = "EMPTY"
+		name_lbl.add_theme_color_override("font_color", C_DIM)
+	else:
+		name_lbl.text = weapon.get("name", "Unknown")
+		name_lbl.add_theme_color_override("font_color", C_TEXT)
 
 	var eff := GameManager.get_farming_efficiency()
 	_efficiency_label.text = "Efficiency: %.0f%%" % (eff * 100.0)

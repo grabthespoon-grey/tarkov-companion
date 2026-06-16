@@ -3,17 +3,19 @@ extends Node
 const DEGRADE_BASE = 0.04  # 4% per raid at zero danger
 
 func calculate_efficiency(equipment: Dictionary) -> float:
-	# Weapon condition (0.0–1.0) + mod bonus (0.0–0.5) = max 1.5
-	var weapon_cond := _slot_condition(equipment.get("weapon"))
-	var mod_bonus   := GunModSystem.calculate_efficiency_bonus(equipment.get("weapon"))
-	return clampf(weapon_cond + mod_bonus, 0.05, 1.5)
+	# Condition disabled: weapon always contributes 1.0
+	# Restore: replace 1.0 with _slot_condition(equipment.get("weapon"))
+	var mod_bonus := GunModSystem.calculate_efficiency_bonus(equipment.get("weapon"))
+	return clampf(1.0 + mod_bonus, 1.0, 1.5)
 
-func degrade_equipment_after_raid(equipment: Dictionary, danger_factor: float) -> void:
-	var deg = DEGRADE_BASE * (1.0 + danger_factor)
-	for slot in equipment:
-		var item = equipment[slot]
-		if item != null:
-			item["condition"] = maxf(0.0, item.get("condition", 100.0) - deg * 100.0)
+func degrade_equipment_after_raid(equipment: Dictionary, _danger_factor: float) -> void:
+	pass
+	# Condition disabled — restore by replacing with:
+	# var deg = DEGRADE_BASE * (1.0 + _danger_factor)
+	# for slot in equipment:
+	#     var item = equipment[slot]
+	#     if item != null:
+	#         item["condition"] = maxf(0.0, item.get("condition", 100.0) - deg * 100.0)
 
 func repair_item(item: Dictionary, amount: float) -> void:
 	item["condition"] = minf(100.0, item.get("condition", 100.0) + amount)
