@@ -2,6 +2,7 @@
   {
     "id": "ak74",
     "name": "AK-74",
+    "ammo_type": "7.62mm",
     "base_stats": {
       "damage": 45,
       "accuracy": 55,
@@ -22,6 +23,7 @@
   {
     "id": "m4a1",
     "name": "M4A1",
+    "ammo_type": "5.56mm",
     "base_stats": {
       "damage": 41,
       "accuracy": 65,
@@ -44,6 +46,7 @@
   {
     "id": "mp5",
     "name": "MP5",
+    "ammo_type": "9mm",
     "base_stats": {
       "damage": 33,
       "accuracy": 60,

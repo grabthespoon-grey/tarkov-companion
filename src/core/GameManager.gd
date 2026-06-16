@@ -14,6 +14,12 @@ var game_state: Dictionary = {
 		"is_deployed": false,
 		"deploy_start_time": 0.0,
 		"deploy_location": "",
+		"ammo_penalty": 0.0,
+	},
+	"ammo": {
+		"9mm":    90,
+		"7.62mm": 60,
+		"5.56mm": 45,
 	},
 	"equipment": {
 		"weapon": {
@@ -36,6 +42,11 @@ func _ready() -> void:
 
 func _load_save() -> void:
 	SaveManager.load_game()
+	# Migrate saves that predate the ammo system
+	if "ammo" not in game_state:
+		game_state["ammo"] = {"9mm": 90, "7.62mm": 60, "5.56mm": 45}
+	if "ammo_penalty" not in game_state.operator:
+		game_state.operator["ammo_penalty"] = 0.0
 
 func get_farming_efficiency() -> float:
 	return EquipmentSystem.calculate_efficiency(game_state.equipment)
@@ -44,6 +55,14 @@ func deploy_operator(location_id: String) -> bool:
 	if game_state.operator.is_deployed:
 		return false
 
+	var weapon = game_state.equipment.get("weapon")
+	var weapon_id: String = weapon.get("type_id", "") if weapon is Dictionary else ""
+	if not AmmoSystem.can_deploy(weapon_id):
+		return false
+
+	var penalty := AmmoSystem.get_fail_penalty(weapon_id)
+	AmmoSystem.consume_for_raid(weapon_id)
+	game_state.operator.ammo_penalty = penalty
 	game_state.operator.is_deployed = true
 	game_state.operator.deploy_start_time = Time.get_unix_time_from_system()
 	game_state.operator.deploy_location = location_id
@@ -54,7 +73,7 @@ func deploy_operator(location_id: String) -> bool:
 	return true
 
 func _on_farm_completed(location_id: String, efficiency: float) -> void:
-	var loot_result = LootSystem.roll_loot(location_id, efficiency)
+	var loot_result = LootSystem.roll_loot(location_id, efficiency, game_state.operator.get("ammo_penalty", 0.0))
 
 	game_state.operator.is_deployed = false
 	game_state.operator.deploy_location = ""

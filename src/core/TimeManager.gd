@@ -45,6 +45,7 @@ func get_time_remaining() -> int:
 	return max(0, int(_farm_duration - _farm_elapsed))
 
 func _on_tick() -> void:
+	AmmoSystem.tick(1.0)
 	if not _is_running:
 		return
 	_farm_elapsed += 1.0

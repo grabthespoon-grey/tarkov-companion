@@ -28,6 +28,7 @@ SaveManager="*res://src/core/SaveManager.gd"
 LootSystem="*res://src/systems/LootSystem.gd"
 EquipmentSystem="*res://src/systems/EquipmentSystem.gd"
 GunModSystem="*res://src/systems/GunModSystem.gd"
+AmmoSystem="*res://src/systems/AmmoSystem.gd"
 SteamManager="*res://src/steam/SteamManager.gd"
 
 [display]

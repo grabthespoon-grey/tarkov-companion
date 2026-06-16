@@ -36,14 +36,14 @@ func get_unlocked_locations(player_level: int) -> Array:
 		return player_level >= req.get("level", 1)
 	)
 
-func roll_loot(location_id: String, efficiency: float) -> Dictionary:
+func roll_loot(location_id: String, efficiency: float, ammo_penalty: float = 0.0) -> Dictionary:
 	var location = get_location(location_id)
 	if location.is_empty():
 		return {"failed": true, "reason": "invalid_location"}
 
 	var danger = location.get("danger_level", 0.3)
-	# Higher efficiency reduces failure chance significantly
-	var fail_chance = danger * (1.0 - clampf(efficiency * 0.6, 0.0, 0.8))
+	# Higher efficiency reduces failure chance; low ammo increases it
+	var fail_chance = danger * (1.0 - clampf(efficiency * 0.6, 0.0, 0.8)) + ammo_penalty
 	if randf() < fail_chance:
 		return {
 			"failed": true,

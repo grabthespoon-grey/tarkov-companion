@@ -27,6 +27,7 @@ var _selected_location: String = "factory"
 var _gun_mod_panel:       Control
 var _gun_mod_slots_vbox:  VBoxContainer
 var _gun_mod_stats_vbox:  VBoxContainer
+var _ammo_vbox:           VBoxContainer
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -49,6 +50,7 @@ func _build_ui() -> void:
 	_add_header(root)
 	_add_operator_panel(root)
 	_add_equipment_panel(root)
+	_add_ammo_panel(root)
 	_add_location_panel(root)
 	_add_raid_panel(root)
 	_add_inventory_panel(root)
@@ -116,6 +118,16 @@ func _add_equipment_panel(parent: Control) -> void:
 	mod_btn.custom_minimum_size.x = 40
 	mod_btn.pressed.connect(_on_gun_mod_pressed)
 	weapon_row.add_child(mod_btn)
+
+func _add_ammo_panel(parent: Control) -> void:
+	var p = _panel(parent)
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 4)
+	p.add_child(vbox)
+	vbox.add_child(_label("AMMO", C_ACCENT, 11))
+	_ammo_vbox = VBoxContainer.new()
+	_ammo_vbox.add_theme_constant_override("separation", 3)
+	vbox.add_child(_ammo_vbox)
 
 func _add_location_panel(parent: Control) -> void:
 	var p = _panel(parent)
@@ -258,9 +270,12 @@ func _connect_signals() -> void:
 	GameManager.operator_deployed.connect(_on_operator_deployed)
 	GameManager.operator_returned.connect(_on_operator_returned)
 	GameManager.equipment_changed.connect(func(_s): _refresh_equipment())
+	GameManager.equipment_changed.connect(func(_s): _refresh_ammo_panel())
 	GameManager.inventory_changed.connect(_refresh_inventory)
 	GameManager.rubles_changed.connect(func(v): _rubles_label.text = "₽ %s" % _fmt_number(v))
+	GameManager.rubles_changed.connect(func(_v): _refresh_ammo_panel())
 	TimeManager.farm_progress_updated.connect(_on_farm_progress)
+	AmmoSystem.ammo_changed.connect(func(_t, _c): _refresh_ammo_panel())
 
 func _on_location_selected(loc_id: String, btn: Button) -> void:
 	_selected_location = loc_id
@@ -280,15 +295,14 @@ func _on_operator_deployed(_loc_id: String) -> void:
 	_raid_label.text = "RAID: %s" % loc.get("name", "Unknown").to_upper()
 
 func _on_operator_returned(_result: Dictionary) -> void:
-	_deploy_btn.disabled = false
 	_status_label.text = "● READY"
 	_status_label.add_theme_color_override("font_color", C_GREEN)
 	_raid_panel.hide()
 	_raid_progress.value = 0.0
-	# Level may have changed — refresh header fields
 	var state = GameManager.game_state
 	_level_label.text = "Lv.%d" % state.operator.level
 	_refresh_equipment()
+	_refresh_ammo_panel()
 
 func _on_farm_progress(progress: float, time_remaining: int) -> void:
 	_raid_progress.value = progress
@@ -307,6 +321,7 @@ func _refresh_all() -> void:
 	_level_label.text = "Lv.%d" % state.operator.level
 	_rubles_label.text = "₽ %s" % _fmt_number(state.rubles)
 	_refresh_equipment()
+	_refresh_ammo_panel()
 	_refresh_inventory()
 
 func _refresh_equipment() -> void:
@@ -322,6 +337,53 @@ func _refresh_equipment() -> void:
 
 	var eff := GameManager.get_farming_efficiency()
 	_efficiency_label.text = "Efficiency: %.0f%%" % (eff * 100.0)
+
+func _refresh_ammo_panel() -> void:
+	for c in _ammo_vbox.get_children(): c.queue_free()
+
+	var weapon = GameManager.game_state.equipment.get("weapon")
+	var weapon_id: String = weapon.get("type_id", "") if weapon is Dictionary else ""
+	var ammo_type := AmmoSystem.get_ammo_type_for_weapon(weapon_id)
+	if ammo_type.is_empty():
+		_ammo_vbox.add_child(_label("No weapon equipped", C_DIM, 9))
+		_deploy_btn.disabled = GameManager.game_state.operator.is_deployed
+		return
+
+	var cfg = AmmoSystem.AMMO_CONFIG[ammo_type]
+	var count := AmmoSystem.get_count(ammo_type)
+	var cap: int = cfg["regen_cap"]
+	var min_raid: int = cfg["min_for_raid"]
+	var optimal: int = cfg["optimal"]
+
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	_ammo_vbox.add_child(row)
+
+	var count_color := C_GREEN if count >= optimal else (C_ACCENT if count >= min_raid else C_RED)
+	var type_lbl = _label("%s  %d/%d" % [ammo_type, count, cap], count_color, 10)
+	type_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(type_lbl)
+
+	var regen_per_min := int(cfg["regen_per_sec"] * 60.0 + 0.5)
+	row.add_child(_label("+%d/min" % regen_per_min, C_DIM, 9))
+
+	var captured_ammo_type := ammo_type
+	var buy_btn = _button("BUY ₽%s" % _fmt_number(cfg["buy_cost_per_30"]), C_PANEL)
+	buy_btn.custom_minimum_size = Vector2(90, 22)
+	buy_btn.disabled = GameManager.game_state.rubles < cfg["buy_cost_per_30"]
+	buy_btn.pressed.connect(func():
+		AmmoSystem.buy_ammo(captured_ammo_type)
+	)
+	row.add_child(buy_btn)
+
+	if count < min_raid:
+		_ammo_vbox.add_child(_label("⚠ INSUFFICIENT AMMO — CANNOT DEPLOY", C_RED, 9))
+	elif count < optimal:
+		var penalty_pct := int(AmmoSystem.get_fail_penalty(weapon_id) * 100.0)
+		_ammo_vbox.add_child(_label("▲ LOW AMMO  +%d%% FAIL RISK" % penalty_pct, C_ACCENT, 9))
+
+	var is_deployed: bool = GameManager.game_state.operator.is_deployed
+	_deploy_btn.disabled = is_deployed or not AmmoSystem.can_deploy(weapon_id)
 
 func _refresh_inventory() -> void:
 	for child in _inventory_list.get_children():
