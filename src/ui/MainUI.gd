@@ -44,6 +44,11 @@ var _raid_log_vbox:       VBoxContainer
 var _log_tick:            int = 0
 var _log_entries:         Array = []
 var _raid_location_id:    String = ""
+var _result_panel:        Control
+var _result_items_vbox:   VBoxContainer
+var _pending_items:       Array = []
+var _current_loot_result: Dictionary = {}
+var _result_popup_visible: bool = false
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -71,10 +76,14 @@ func _build_ui() -> void:
 	_add_raid_panel(root)
 	_add_inventory_panel(root)
 
-	# Gun mod overlay lives outside the scroll container so it covers everything
+	# Overlays live outside the scroll container so they cover everything
 	_gun_mod_panel = _build_gun_mod_panel()
 	add_child(_gun_mod_panel)
 	_gun_mod_panel.hide()
+
+	_result_panel = _build_result_panel()
+	add_child(_result_panel)
+	_result_panel.hide()
 
 func _add_header(parent: Control) -> void:
 	var hdr = _panel(parent, Color(0.05, 0.05, 0.05))
@@ -301,6 +310,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _connect_signals() -> void:
 	GameManager.operator_deployed.connect(_on_operator_deployed)
 	GameManager.operator_returned.connect(_on_operator_returned)
+	GameManager.raid_result_pending.connect(_on_raid_result_pending)
 	GameManager.equipment_changed.connect(func(_s): _refresh_equipment())
 	GameManager.equipment_changed.connect(func(_s): _refresh_ammo_panel())
 	GameManager.inventory_changed.connect(_refresh_inventory)
@@ -363,6 +373,112 @@ func _on_farm_progress(progress: float, time_remaining: int) -> void:
 func _on_gun_mod_pressed() -> void:
 	_refresh_gun_mod_panel()
 	_gun_mod_panel.show()
+
+func _on_raid_result_pending(loot_result: Dictionary) -> void:
+	_raid_panel.hide()
+	_raid_progress.value = 0.0
+	_log_entries.clear()
+	_result_popup_visible = true
+	_deploy_btn.disabled = true
+	_current_loot_result = loot_result
+	_pending_items = loot_result.get("pending_items", []).duplicate()
+	_refresh_result_panel()
+	_result_panel.show()
+
+func _refresh_result_panel() -> void:
+	for c in _result_items_vbox.get_children(): c.queue_free()
+
+	var failed: bool = _current_loot_result.get("failed", false)
+	var loc_name: String = _current_loot_result.get("location_name", "Unknown")
+	var ammo_type: String = _current_loot_result.get("ammo_type", "")
+	var ammo_consumed: int = _current_loot_result.get("ammo_consumed", 30)
+
+	var hdr = HBoxContainer.new()
+	hdr.add_theme_constant_override("separation", 8)
+	_result_items_vbox.add_child(hdr)
+	var status_lbl = _label("FAILED" if failed else "SUCCESS", C_RED if failed else C_GREEN, 12)
+	status_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hdr.add_child(status_lbl)
+	hdr.add_child(_label(loc_name, C_DIM, 10))
+
+	if not ammo_type.is_empty():
+		_result_items_vbox.add_child(_label("탄약 소모: %s × %d발" % [ammo_type, ammo_consumed], C_DIM, 9))
+
+	if not failed:
+		var rubles: int = _current_loot_result.get("rubles", 0)
+		if rubles > 0:
+			_result_items_vbox.add_child(_label("₽ +%s" % _fmt_number(rubles), C_GREEN, 10))
+
+		_result_items_vbox.add_child(HSeparator.new())
+
+		if _pending_items.is_empty():
+			_result_items_vbox.add_child(_label("획득 아이템 없음", C_DIM, 10))
+		else:
+			_result_items_vbox.add_child(_label("획득 아이템 (%d)  — 판매하지 않으면 인벤토리 보관" % _pending_items.size(), C_DIM, 9))
+			for item in _pending_items:
+				var captured_item = item
+				var row = HBoxContainer.new()
+				row.add_theme_constant_override("separation", 4)
+				_result_items_vbox.add_child(row)
+
+				var name_lbl = _label(item.get("name", "?"), C_TEXT, 10)
+				name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				row.add_child(name_lbl)
+
+				var tier: int = item.get("tier", 0)
+				if tier >= 1 and item.get("category", "") != "weapon":
+					row.add_child(_label("T%d" % tier, _tier_color(tier), 9))
+				else:
+					row.add_child(_label(item.get("rarity", "").to_upper(), _rarity_color(item.get("rarity", "common")), 9))
+
+				var sell_value: int = item.get("base_value", 100)
+				var sell_btn = _button("SELL ₽%s" % _fmt_number(sell_value), C_PANEL)
+				sell_btn.custom_minimum_size = Vector2(80, 22)
+				sell_btn.pressed.connect(func(): _on_result_sell_item(captured_item))
+				row.add_child(sell_btn)
+
+func _on_result_sell_item(item: Dictionary) -> void:
+	_pending_items.erase(item)
+	GameManager.sell_pending_item(item)
+	_refresh_result_panel()
+
+func _on_result_confirm() -> void:
+	_result_popup_visible = false
+	_result_panel.hide()
+	GameManager.confirm_loot(_pending_items)
+	_pending_items.clear()
+
+func _build_result_panel() -> Control:
+	var overlay = ColorRect.new()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.color = Color(0, 0, 0, 0.85)
+
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_PASS
+	overlay.add_child(center)
+
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(420, 0)
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel.add_theme_stylebox_override("panel", _make_stylebox(C_PANEL, C_BORDER))
+	center.add_child(panel)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	panel.add_child(vbox)
+
+	vbox.add_child(_label("RAID RESULT", C_ACCENT, 13))
+
+	_result_items_vbox = VBoxContainer.new()
+	_result_items_vbox.add_theme_constant_override("separation", 5)
+	vbox.add_child(_result_items_vbox)
+
+	var confirm_btn = _button("✔  CONFIRM", C_ACCENT)
+	confirm_btn.pressed.connect(_on_result_confirm)
+	vbox.add_child(confirm_btn)
+
+	return overlay
 
 func _get_phase_index(progress: float) -> int:
 	if progress < 0.2:  return 0
@@ -452,7 +568,7 @@ func _refresh_ammo_panel() -> void:
 		_ammo_vbox.add_child(_label("▲ LOW AMMO  +%d%% FAIL RISK" % penalty_pct, C_ACCENT, 9))
 
 	var is_deployed: bool = GameManager.game_state.operator.is_deployed
-	_deploy_btn.disabled = is_deployed or not AmmoSystem.can_deploy(weapon_id)
+	_deploy_btn.disabled = is_deployed or not AmmoSystem.can_deploy(weapon_id) or _result_popup_visible
 
 func _refresh_inventory() -> void:
 	for child in _inventory_list.get_children():

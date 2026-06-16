@@ -2,9 +2,12 @@ extends Node
 
 signal operator_deployed(location_id: String)
 signal operator_returned(loot_result: Dictionary)
+signal raid_result_pending(loot_result: Dictionary)
 signal equipment_changed(slot: String)
 signal inventory_changed()
 signal rubles_changed(new_amount: int)
+
+var _pending_loot_result: Dictionary = {}
 
 var game_state: Dictionary = {
 	"operator": {
@@ -80,34 +83,54 @@ func deploy_operator(location_id: String) -> bool:
 func _on_farm_completed(location_id: String, efficiency: float) -> void:
 	var loot_result = LootSystem.roll_loot(location_id, efficiency, game_state.operator.get("ammo_penalty", 0.0))
 
+	var weapon = game_state.equipment.get("weapon")
+	var weapon_id: String = weapon.get("type_id", "") if weapon is Dictionary else ""
+	var ammo_type := AmmoSystem.get_ammo_type_for_weapon(weapon_id)
+	loot_result["ammo_type"] = ammo_type
+	loot_result["ammo_consumed"] = int(AmmoSystem.AMMO_CONFIG.get(ammo_type, {}).get("consume_per_raid", 30)) if not ammo_type.is_empty() else 0
+
 	game_state.operator.is_deployed = false
 	game_state.operator.deploy_location = ""
 	game_state.total_raids += 1
+
+	var pending_items: Array = []
 
 	if not loot_result.get("failed", false):
 		game_state.successful_raids += 1
 		for item in loot_result.get("items", []):
 			if item.get("category") == "ammo":
-				# Ammo absorbed directly — never goes to inventory
-				var ammo_type: String = item.get("ammo_type", "")
-				if ammo_type in game_state.ammo:
+				var ammo_t: String = item.get("ammo_type", "")
+				if ammo_t in game_state.ammo:
 					var amount: int = randi_range(item.get("min_amount", 15), item.get("max_amount", 45))
-					game_state.ammo[ammo_type] += amount
-					AmmoSystem.ammo_changed.emit(ammo_type, game_state.ammo[ammo_type])
+					game_state.ammo[ammo_t] += amount
+					AmmoSystem.ammo_changed.emit(ammo_t, game_state.ammo[ammo_t])
 			else:
-				game_state.inventory.append(item.duplicate())
+				pending_items.append(item.duplicate())
 		game_state.rubles += loot_result.get("rubles", 0)
-		emit_signal("inventory_changed")
 		emit_signal("rubles_changed", game_state.rubles)
 
 	EquipmentSystem.degrade_equipment_after_raid(
 		game_state.equipment,
 		loot_result.get("danger_encountered", 0.5)
 	)
-
 	_add_experience(loot_result)
-	emit_signal("operator_returned", loot_result)
+
+	loot_result["pending_items"] = pending_items
+	_pending_loot_result = loot_result
+	emit_signal("raid_result_pending", loot_result)
 	SaveManager.save_game()
+
+func confirm_loot(kept_items: Array) -> void:
+	for item in kept_items:
+		game_state.inventory.append(item)
+	emit_signal("inventory_changed")
+	emit_signal("operator_returned", _pending_loot_result)
+	_pending_loot_result = {}
+	SaveManager.save_game()
+
+func sell_pending_item(item: Dictionary) -> void:
+	game_state.rubles += item.get("base_value", 100)
+	emit_signal("rubles_changed", game_state.rubles)
 
 func _add_experience(loot_result: Dictionary) -> void:
 	if loot_result.get("failed", false):
