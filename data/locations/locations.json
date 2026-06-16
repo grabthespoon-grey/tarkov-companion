@@ -8,8 +8,8 @@
     "max_time_minutes": 0.333,
     "min_loot": 1,
     "max_loot": 3,
-    "min_rubles": 100,
-    "max_rubles": 500,
+    "min_rubles": 0,
+    "max_rubles": 0,
     "unlock_requirement": null,
     "loot_table": [
       {
@@ -111,8 +111,8 @@
     "max_time_minutes": 0.5,
     "min_loot": 2,
     "max_loot": 5,
-    "min_rubles": 300,
-    "max_rubles": 1200,
+    "min_rubles": 0,
+    "max_rubles": 0,
     "unlock_requirement": {
       "level": 3
     },
@@ -224,8 +224,8 @@
     "max_time_minutes": 0.75,
     "min_loot": 3,
     "max_loot": 6,
-    "min_rubles": 600,
-    "max_rubles": 2500,
+    "min_rubles": 0,
+    "max_rubles": 0,
     "unlock_requirement": {
       "level": 6
     },
@@ -333,8 +333,8 @@
     "max_time_minutes": 1.0,
     "min_loot": 4,
     "max_loot": 8,
-    "min_rubles": 1500,
-    "max_rubles": 6000,
+    "min_rubles": 0,
+    "max_rubles": 0,
     "unlock_requirement": {
       "level": 10
     },

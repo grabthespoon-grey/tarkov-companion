@@ -12,7 +12,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1011,
-    "base_value": 800
+    "base_value": 1100
   },
   {
     "id": "ak_74_muzzle_brake",
@@ -27,7 +27,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1001,
-    "base_value": 1500
+    "base_value": 1800
   },
   {
     "id": "ak_dtk_1_suppressor",
@@ -42,7 +42,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1002,
-    "base_value": 28000
+    "base_value": 3000
   },
   {
     "id": "ak74_zenitco_dtk4_t4",
@@ -57,7 +57,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1012,
-    "base_value": 52000
+    "base_value": 4500
   },
   {
     "id": "m4_a2_flash_hider_t1",
@@ -72,7 +72,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1013,
-    "base_value": 700
+    "base_value": 1100
   },
   {
     "id": "m4_strike_jcomp_t2",
@@ -87,7 +87,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1014,
-    "base_value": 4500
+    "base_value": 1800
   },
   {
     "id": "m4_surefire_socom_t3",
@@ -102,7 +102,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1015,
-    "base_value": 42000
+    "base_value": 3000
   },
   {
     "id": "m4_aac_blackout_t4",
@@ -117,7 +117,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1016,
-    "base_value": 68000
+    "base_value": 4500
   },
   {
     "id": "mp5_thread_protector_t1",
@@ -132,7 +132,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1017,
-    "base_value": 500
+    "base_value": 1100
   },
   {
     "id": "mp5_flash_hider_t2",
@@ -147,7 +147,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1018,
-    "base_value": 3200
+    "base_value": 1800
   },
   {
     "id": "mp5_gso_suppressor",
@@ -162,7 +162,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1010,
-    "base_value": 38000
+    "base_value": 3000
   },
   {
     "id": "mp5_bt_suppressor_t4",
@@ -177,7 +177,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1019,
-    "base_value": 62000
+    "base_value": 4500
   },
   {
     "id": "iron_sights_t1",
@@ -194,7 +194,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1020,
-    "base_value": 300
+    "base_value": 1100
   },
   {
     "id": "holosun_hs510c",
@@ -211,7 +211,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1008,
-    "base_value": 9000
+    "base_value": 1800
   },
   {
     "id": "eotech_553_t3",
@@ -227,7 +227,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1021,
-    "base_value": 32000
+    "base_value": 3000
   },
   {
     "id": "elcan_specter_dr",
@@ -243,7 +243,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1004,
-    "base_value": 45000
+    "base_value": 4500
   },
   {
     "id": "mp5_aimpoint_t4",
@@ -258,7 +258,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1022,
-    "base_value": 48000
+    "base_value": 4500
   },
   {
     "id": "ak74_standard_stock_t1",
@@ -273,7 +273,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1023,
-    "base_value": 600
+    "base_value": 1100
   },
   {
     "id": "ak74_magpul_moe_t2",
@@ -288,7 +288,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1024,
-    "base_value": 5500
+    "base_value": 1800
   },
   {
     "id": "ak_magpul_zhukov_stock",
@@ -303,7 +303,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1005,
-    "base_value": 8500
+    "base_value": 3000
   },
   {
     "id": "ak74_fab_defense_t4",
@@ -318,7 +318,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1025,
-    "base_value": 35000
+    "base_value": 4500
   },
   {
     "id": "m4_standard_stock_t1",
@@ -333,7 +333,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1026,
-    "base_value": 700
+    "base_value": 1100
   },
   {
     "id": "m4_magpul_moe_t2",
@@ -348,7 +348,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1027,
-    "base_value": 4800
+    "base_value": 1800
   },
   {
     "id": "m4_magpul_prs_t3",
@@ -363,7 +363,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1028,
-    "base_value": 22000
+    "base_value": 3000
   },
   {
     "id": "m4_bcm_gunfighter_t4",
@@ -378,7 +378,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1029,
-    "base_value": 42000
+    "base_value": 4500
   },
   {
     "id": "mp5_standard_stock_t1",
@@ -393,7 +393,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1030,
-    "base_value": 500
+    "base_value": 1100
   },
   {
     "id": "mp5_folding_stock_t2",
@@ -408,7 +408,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1031,
-    "base_value": 3800
+    "base_value": 1800
   },
   {
     "id": "mp5_magpul_stock_t3",
@@ -423,7 +423,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1032,
-    "base_value": 18000
+    "base_value": 3000
   },
   {
     "id": "mp5_sb_tactical_t4",
@@ -438,7 +438,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1033,
-    "base_value": 38000
+    "base_value": 4500
   },
   {
     "id": "ak74_30rd_mag_t1",
@@ -453,7 +453,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1034,
-    "base_value": 800
+    "base_value": 1100
   },
   {
     "id": "ak74_45rd_mag_t2",
@@ -468,7 +468,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1035,
-    "base_value": 5200
+    "base_value": 1800
   },
   {
     "id": "ak_drum_75rd",
@@ -483,7 +483,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1007,
-    "base_value": 22000
+    "base_value": 3000
   },
   {
     "id": "ak74_95rd_t4",
@@ -498,7 +498,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1036,
-    "base_value": 48000
+    "base_value": 4500
   },
   {
     "id": "m4_30rd_mag_t1",
@@ -513,7 +513,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1037,
-    "base_value": 600
+    "base_value": 1100
   },
   {
     "id": "m4_60rd_mag",
@@ -528,7 +528,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1006,
-    "base_value": 6500
+    "base_value": 1800
   },
   {
     "id": "m4_100rd_drum_t3",
@@ -543,7 +543,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1038,
-    "base_value": 28000
+    "base_value": 3000
   },
   {
     "id": "m4_150rd_beta_t4",
@@ -558,7 +558,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1039,
-    "base_value": 55000
+    "base_value": 4500
   },
   {
     "id": "mp5_15rd_mag_t1",
@@ -573,7 +573,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1040,
-    "base_value": 400
+    "base_value": 1100
   },
   {
     "id": "mp5_30rd_mag_t2",
@@ -588,7 +588,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1041,
-    "base_value": 3500
+    "base_value": 1800
   },
   {
     "id": "mp5_50rd_drum_t3",
@@ -603,7 +603,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1042,
-    "base_value": 18500
+    "base_value": 3000
   },
   {
     "id": "mp5_100rd_beta_t4",
@@ -618,7 +618,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1043,
-    "base_value": 42000
+    "base_value": 4500
   },
   {
     "id": "ak74_standard_hg_t1",
@@ -633,7 +633,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1044,
-    "base_value": 700
+    "base_value": 1100
   },
   {
     "id": "ak74_rs_regulate_t2",
@@ -648,7 +648,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1045,
-    "base_value": 7500
+    "base_value": 1800
   },
   {
     "id": "ak74_fab_defense_hg_t3",
@@ -663,7 +663,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1046,
-    "base_value": 24000
+    "base_value": 3000
   },
   {
     "id": "ak74_zenitco_b30_t4",
@@ -678,7 +678,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1047,
-    "base_value": 52000
+    "base_value": 4500
   },
   {
     "id": "m4_standard_hg_t1",
@@ -693,7 +693,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1048,
-    "base_value": 600
+    "base_value": 1100
   },
   {
     "id": "m4_bcm_rail_t2",
@@ -708,7 +708,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1049,
-    "base_value": 9500
+    "base_value": 1800
   },
   {
     "id": "m4_phase5_rail",
@@ -723,7 +723,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1003,
-    "base_value": 12000
+    "base_value": 3000
   },
   {
     "id": "m4_geissele_mk16_t4",
@@ -738,7 +738,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1050,
-    "base_value": 58000
+    "base_value": 4500
   },
   {
     "id": "m4_standard_bcg_t1",
@@ -753,7 +753,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1051,
-    "base_value": 1200
+    "base_value": 1100
   },
   {
     "id": "m4_bcg_mid_t2",
@@ -768,7 +768,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1052,
-    "base_value": 8500
+    "base_value": 1800
   },
   {
     "id": "m4_bcg_enhanced",
@@ -783,7 +783,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1009,
-    "base_value": 32000
+    "base_value": 3000
   },
   {
     "id": "m4_bcg_titanium_t4",
@@ -798,7 +798,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1053,
-    "base_value": 65000
+    "base_value": 4500
   },
   {
     "id": "standard_grip_t1",
@@ -815,7 +815,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1054,
-    "base_value": 400
+    "base_value": 1100
   },
   {
     "id": "magpul_moe_grip_t2",
@@ -832,7 +832,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1055,
-    "base_value": 3200
+    "base_value": 1800
   },
   {
     "id": "hogue_grip_t3",
@@ -849,7 +849,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1056,
-    "base_value": 12000
+    "base_value": 3000
   },
   {
     "id": "tango_down_grip_t4",
@@ -866,7 +866,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1057,
-    "base_value": 28000
+    "base_value": 4500
   },
   {
     "id": "m4_standard_ch_t1",
@@ -881,7 +881,7 @@
     "rarity": "common",
     "steam_tradeable": true,
     "steam_item_def": 1058,
-    "base_value": 500
+    "base_value": 1100
   },
   {
     "id": "m4_raptor_ch_t2",
@@ -896,7 +896,7 @@
     "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1059,
-    "base_value": 4200
+    "base_value": 1800
   },
   {
     "id": "m4_bcm_ch_t3",
@@ -911,7 +911,7 @@
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1060,
-    "base_value": 15000
+    "base_value": 3000
   },
   {
     "id": "m4_geissele_ch_t4",
@@ -926,7 +926,7 @@
     "rarity": "epic",
     "steam_tradeable": true,
     "steam_item_def": 1061,
-    "base_value": 32000
+    "base_value": 4500
   },
   {
     "id": "mp5_drop",
@@ -936,7 +936,7 @@
     "mods": {},
     "rarity": "uncommon",
     "steam_tradeable": false,
-    "base_value": 20000
+    "base_value": 12000
   },
   {
     "id": "ak74_drop",
@@ -946,7 +946,7 @@
     "mods": {},
     "rarity": "rare",
     "steam_tradeable": false,
-    "base_value": 35000
+    "base_value": 25000
   },
   {
     "id": "m4a1_drop",
@@ -956,7 +956,7 @@
     "mods": {},
     "rarity": "epic",
     "steam_tradeable": false,
-    "base_value": 55000
+    "base_value": 50000
   },
   {
     "id": "ammo_9mm_30",
@@ -965,7 +965,7 @@
     "ammo_type": "9mm",
     "rarity": "common",
     "steam_tradeable": false,
-    "base_value": 1500,
+    "base_value": 0,
     "min_amount": 15,
     "max_amount": 45
   },
@@ -976,7 +976,7 @@
     "ammo_type": "7.62mm",
     "rarity": "uncommon",
     "steam_tradeable": false,
-    "base_value": 4200,
+    "base_value": 0,
     "min_amount": 15,
     "max_amount": 45
   },
@@ -987,7 +987,7 @@
     "ammo_type": "5.56mm",
     "rarity": "rare",
     "steam_tradeable": false,
-    "base_value": 9000,
+    "base_value": 0,
     "min_amount": 15,
     "max_amount": 45
   }
