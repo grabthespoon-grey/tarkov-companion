@@ -59,6 +59,22 @@ func _load_save() -> void:
 func get_farming_efficiency() -> float:
 	return EquipmentSystem.calculate_efficiency(game_state.equipment)
 
+func get_loot_bonus() -> float:
+	var weapon = game_state.equipment.get("weapon")
+	if not weapon is Dictionary: return 0.0
+	var total := 0.0
+	for slot in weapon.get("mods", {}):
+		total += weapon["mods"][slot].get("loot_bonus", 0.0)
+	return total
+
+func get_fail_reduction() -> float:
+	var weapon = game_state.equipment.get("weapon")
+	if not weapon is Dictionary: return 0.0
+	var total := 0.0
+	for slot in weapon.get("mods", {}):
+		total += weapon["mods"][slot].get("fail_reduction", 0.0)
+	return total
+
 func deploy_operator(location_id: String) -> bool:
 	if game_state.operator.is_deployed:
 		return false
@@ -81,7 +97,7 @@ func deploy_operator(location_id: String) -> bool:
 	return true
 
 func _on_farm_completed(location_id: String, efficiency: float) -> void:
-	var loot_result = LootSystem.roll_loot(location_id, efficiency, game_state.operator.get("ammo_penalty", 0.0))
+	var loot_result = LootSystem.roll_loot(location_id, efficiency, game_state.operator.get("ammo_penalty", 0.0), get_loot_bonus(), get_fail_reduction())
 
 	var weapon = game_state.equipment.get("weapon")
 	var weapon_id: String = weapon.get("type_id", "") if weapon is Dictionary else ""

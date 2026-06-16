@@ -428,6 +428,9 @@ func _refresh_result_panel() -> void:
 				var tier: int = item.get("tier", 0)
 				if tier >= 1 and item.get("category", "") != "weapon":
 					row.add_child(_label("T%d" % tier, _tier_color(tier), 9))
+					var ql := _quality_label(item.get("quality", "standard"))
+					if not ql.is_empty():
+						row.add_child(_label(ql, _quality_color(item.get("quality", "standard")), 9))
 				else:
 					row.add_child(_label(item.get("rarity", "").to_upper(), _rarity_color(item.get("rarity", "common")), 9))
 
@@ -593,6 +596,9 @@ func _refresh_inventory() -> void:
 			var tier_lbl = _label("T%d" % tier, _tier_color(tier), 9)
 			tier_lbl.custom_minimum_size.x = 20
 			row.add_child(tier_lbl)
+			var ql := _quality_label(item.get("quality", "standard"))
+			if not ql.is_empty():
+				row.add_child(_label(ql, _quality_color(item.get("quality", "standard")), 9))
 		else:
 			var rarity_color := _rarity_color(item.get("rarity", "common"))
 			row.add_child(_label(item.get("rarity", "").to_upper(), rarity_color, 9))
@@ -630,6 +636,20 @@ func _tier_color(tier: int) -> Color:
 	var rarities := ["", "common", "uncommon", "rare", "epic"]
 	return _rarity_color(rarities[tier] if tier >= 1 and tier <= 4 else "common")
 
+func _quality_label(quality: String) -> String:
+	match quality:
+		"refined":    return "정제"
+		"pristine":   return "순정"
+		"masterwork": return "장인"
+		_:            return ""
+
+func _quality_color(quality: String) -> Color:
+	match quality:
+		"refined":    return Color(0.3, 0.7, 0.3)
+		"pristine":   return Color(0.3, 0.5, 0.9)
+		"masterwork": return Color(0.7, 0.3, 0.9)
+		_:            return C_DIM
+
 func _refresh_gun_mod_panel() -> void:
 	for c in _gun_mod_slots_vbox.get_children(): c.queue_free()
 	for c in _gun_mod_stats_vbox.get_children(): c.queue_free()
@@ -662,6 +682,10 @@ func _refresh_gun_mod_panel() -> void:
 			var tier_lbl = _label("T%d" % tier, _tier_color(tier), 8)
 			tier_lbl.custom_minimum_size.x = 18
 			row.add_child(tier_lbl)
+
+			var eq_ql := _quality_label(equipped_mod.get("quality", "standard"))
+			if not eq_ql.is_empty():
+				row.add_child(_label(eq_ql, _quality_color(equipped_mod.get("quality", "standard")), 8))
 
 			var bonus_pct := int(equipped_mod.get("efficiency_bonus", 0.0) * 100.0)
 			row.add_child(_label("+%d%%" % bonus_pct, C_GREEN, 8))
@@ -715,6 +739,8 @@ func _refresh_gun_mod_panel() -> void:
 
 	_gun_mod_stats_vbox.add_child(_label("EFFICIENCY", C_ACCENT, 11))
 	var total_bonus := 0.0
+	var total_loot := 0.0
+	var total_fail_red := 0.0
 	for slot in GunModSystem.get_available_slots(weapon):
 		var mods: Dictionary = weapon.get("mods", {})
 		if slot not in mods:
@@ -722,13 +748,19 @@ func _refresh_gun_mod_panel() -> void:
 		var m: Dictionary = mods[slot]
 		var bonus: float = m.get("efficiency_bonus", 0.0)
 		total_bonus += bonus
+		total_loot += m.get("loot_bonus", 0.0)
+		total_fail_red += m.get("fail_reduction", 0.0)
 		var row = HBoxContainer.new()
 		_gun_mod_stats_vbox.add_child(row)
 		var k = _label(slot.replace("_", " ").to_upper(), C_DIM, 9)
 		k.custom_minimum_size.x = 90
 		row.add_child(k)
 		var tier: int = m.get("tier", 0)
-		row.add_child(_label("T%d  +%d%%" % [tier, int(bonus * 100.0)], _tier_color(tier), 9))
+		var quality: String = m.get("quality", "standard")
+		var tier_str := "T%d" % tier
+		if quality != "standard":
+			tier_str += "·%s" % _quality_label(quality)
+		row.add_child(_label("%s  +%d%%" % [tier_str, int(bonus * 100.0)], _tier_color(tier), 9))
 
 	var eff_row = HBoxContainer.new()
 	_gun_mod_stats_vbox.add_child(eff_row)
@@ -737,6 +769,22 @@ func _refresh_gun_mod_panel() -> void:
 	eff_row.add_child(total_lbl)
 	var eff_pct := clampf(1.0 + total_bonus, 1.0, 1.5) * 100.0
 	eff_row.add_child(_label("%.0f%%" % eff_pct, C_ACCENT, 9))
+
+	if total_loot > 0.0:
+		var lr = HBoxContainer.new()
+		_gun_mod_stats_vbox.add_child(lr)
+		var ll = _label("LOOT BONUS", C_ACCENT, 9)
+		ll.custom_minimum_size.x = 90
+		lr.add_child(ll)
+		lr.add_child(_label("+%.0f%%" % (total_loot * 100.0), C_GREEN, 9))
+
+	if total_fail_red > 0.0:
+		var fr = HBoxContainer.new()
+		_gun_mod_stats_vbox.add_child(fr)
+		var fl = _label("FAIL RISK", C_ACCENT, 9)
+		fl.custom_minimum_size.x = 90
+		fr.add_child(fl)
+		fr.add_child(_label("-%.0f%%p" % (total_fail_red * 100.0), C_GREEN, 9))
 
 # ── UI Helpers ─────────────────────────────────────────────────────────────
 

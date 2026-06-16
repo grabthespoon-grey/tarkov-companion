@@ -36,14 +36,16 @@ func get_unlocked_locations(player_level: int) -> Array:
 		return player_level >= req.get("level", 1)
 	)
 
-func roll_loot(location_id: String, efficiency: float, ammo_penalty: float = 0.0) -> Dictionary:
+func roll_loot(location_id: String, efficiency: float, ammo_penalty: float = 0.0, loot_bonus: float = 0.0, fail_reduction: float = 0.0) -> Dictionary:
 	var location = get_location(location_id)
 	if location.is_empty():
 		return {"failed": true, "reason": "invalid_location"}
 
 	var danger = location.get("danger_level", 0.3)
-	# Higher efficiency reduces failure chance; low ammo increases it
-	var fail_chance = danger * (1.0 - clampf(efficiency * 0.6, 0.0, 0.8)) + ammo_penalty
+	var fail_chance = clampf(
+		danger * (1.0 - clampf(efficiency * 0.6, 0.0, 0.8)) + ammo_penalty - fail_reduction,
+		0.0, 1.0
+	)
 	if randf() < fail_chance:
 		return {
 			"failed": true,
@@ -56,7 +58,7 @@ func roll_loot(location_id: String, efficiency: float, ammo_penalty: float = 0.0
 		randf_range(
 			location.get("min_loot", 1),
 			location.get("max_loot", 4)
-		) * clampf(efficiency, 0.5, 1.8)
+		) * clampf(efficiency, 0.5, 1.8) * (1.0 + loot_bonus)
 	)
 
 	var items: Array = []
@@ -65,11 +67,12 @@ func roll_loot(location_id: String, efficiency: float, ammo_penalty: float = 0.0
 		if not item.is_empty():
 			var inst = item.duplicate(true)
 			inst["condition"] = randf_range(50.0, 95.0)
+			_apply_quality(inst)
 			items.append(inst)
 
 	var ruble_base = randf_range(
-		location.get("min_rubles", 100),
-		location.get("max_rubles", 800)
+		location.get("min_rubles", 0),
+		location.get("max_rubles", 0)
 	)
 
 	return {
@@ -79,6 +82,35 @@ func roll_loot(location_id: String, efficiency: float, ammo_penalty: float = 0.0
 		"danger_encountered": danger,
 		"location_name": location.get("name", "Unknown"),
 	}
+
+func _apply_quality(item: Dictionary) -> void:
+	if item.get("category", "") in ["weapon", "ammo"]:
+		item["quality"] = "standard"
+		item["loot_bonus"] = 0.0
+		item["fail_reduction"] = 0.0
+		return
+
+	var roll := randf()
+	var quality: String
+	var eff_mult: float
+	var loot_bonus: float = 0.0
+	var fail_reduction: float = 0.0
+	var value_mult: float
+
+	if roll < 0.03:
+		quality = "masterwork"; eff_mult = 1.5;  loot_bonus = 0.10; fail_reduction = 0.03; value_mult = 4.0
+	elif roll < 0.15:
+		quality = "pristine";   eff_mult = 1.3;  loot_bonus = 0.05; fail_reduction = 0.0;  value_mult = 1.8
+	elif roll < 0.40:
+		quality = "refined";    eff_mult = 1.15; loot_bonus = 0.0;  fail_reduction = 0.0;  value_mult = 1.2
+	else:
+		quality = "standard";   eff_mult = 1.0;  loot_bonus = 0.0;  fail_reduction = 0.0;  value_mult = 1.0
+
+	item["quality"] = quality
+	item["efficiency_bonus"] = item.get("efficiency_bonus", 0.0) * eff_mult
+	item["loot_bonus"] = loot_bonus
+	item["fail_reduction"] = fail_reduction
+	item["base_value"] = roundi(item.get("base_value", 0) * value_mult)
 
 func _roll_from_table(loot_table: Array) -> Dictionary:
 	if loot_table.is_empty():
