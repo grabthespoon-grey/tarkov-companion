@@ -8,7 +8,7 @@ func calculate_efficiency(equipment: Dictionary) -> float:
 	var mod_bonus := GunModSystem.calculate_efficiency_bonus(equipment.get("weapon"))
 	return clampf(1.0 + mod_bonus, 1.0, 1.5)
 
-func degrade_equipment_after_raid(equipment: Dictionary, _danger_factor: float) -> void:
+func degrade_equipment_after_raid(_equipment: Dictionary, _danger_factor: float) -> void:
 	pass
 	# Condition disabled — restore by replacing with:
 	# var deg = DEGRADE_BASE * (1.0 + _danger_factor)
