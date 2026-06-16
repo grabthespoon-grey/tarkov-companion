@@ -85,8 +85,8 @@ func _on_farm_completed(location_id: String, efficiency: float) -> void:
 			if item.get("category") == "ammo":
 				# Ammo absorbed directly — never goes to inventory
 				var ammo_type: String = item.get("ammo_type", "")
-				var amount: int = item.get("amount", 0)
 				if ammo_type in game_state.ammo:
+					var amount: int = randi_range(item.get("min_amount", 15), item.get("max_amount", 45))
 					game_state.ammo[ammo_type] += amount
 					AmmoSystem.ammo_changed.emit(ammo_type, game_state.ammo[ammo_type])
 			else:
