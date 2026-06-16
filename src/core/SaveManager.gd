@@ -29,7 +29,7 @@ func load_game() -> void:
 
 	var save_data = json.get_data()
 	_restore_game_state(save_data)
-	_handle_offline_progress(save_data)
+	# _handle_offline_progress(save_data)  # offline farming — disabled, see below
 	_restore_farm_state(save_data)
 
 func _capture_farm_state() -> Dictionary:
