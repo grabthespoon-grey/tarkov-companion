@@ -957,5 +957,35 @@
     "rarity": "epic",
     "steam_tradeable": false,
     "base_value": 55000
+  },
+  {
+    "id": "ammo_9mm_30",
+    "name": "9x19mm Parabellum (30rds)",
+    "category": "ammo",
+    "ammo_type": "9mm",
+    "amount": 30,
+    "rarity": "common",
+    "steam_tradeable": false,
+    "base_value": 1500
+  },
+  {
+    "id": "ammo_762mm_30",
+    "name": "7.62x39mm (30rds)",
+    "category": "ammo",
+    "ammo_type": "7.62mm",
+    "amount": 30,
+    "rarity": "uncommon",
+    "steam_tradeable": false,
+    "base_value": 4200
+  },
+  {
+    "id": "ammo_556mm_30",
+    "name": "5.56x45mm NATO (30rds)",
+    "category": "ammo",
+    "ammo_type": "5.56mm",
+    "amount": 30,
+    "rarity": "rare",
+    "steam_tradeable": false,
+    "base_value": 9000
   }
 ]

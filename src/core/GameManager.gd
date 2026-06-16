@@ -82,7 +82,15 @@ func _on_farm_completed(location_id: String, efficiency: float) -> void:
 	if not loot_result.get("failed", false):
 		game_state.successful_raids += 1
 		for item in loot_result.get("items", []):
-			game_state.inventory.append(item.duplicate())
+			if item.get("category") == "ammo":
+				# Ammo absorbed directly — never goes to inventory
+				var ammo_type: String = item.get("ammo_type", "")
+				var amount: int = item.get("amount", 0)
+				if ammo_type in game_state.ammo:
+					game_state.ammo[ammo_type] += amount
+					AmmoSystem.ammo_changed.emit(ammo_type, game_state.ammo[ammo_type])
+			else:
+				game_state.inventory.append(item.duplicate())
 		game_state.rubles += loot_result.get("rubles", 0)
 		emit_signal("inventory_changed")
 		emit_signal("rubles_changed", game_state.rubles)
