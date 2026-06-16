@@ -128,5 +128,27 @@
     "steam_item_def": 1010,
     "base_value": 38000,
     "description": "Ultra-compact suppressor for 9mm. Best-in-class sound reduction."
+  },
+  {
+    "id": "ak74_drop",
+    "name": "AK-74",
+    "category": "weapon",
+    "type_id": "ak74",
+    "mods": {},
+    "rarity": "rare",
+    "steam_tradeable": false,
+    "base_value": 35000,
+    "description": "Fully functional AK-74. Equip to unlock AK mod slots."
+  },
+  {
+    "id": "m4a1_drop",
+    "name": "M4A1",
+    "category": "weapon",
+    "type_id": "m4a1",
+    "mods": {},
+    "rarity": "epic",
+    "steam_tradeable": false,
+    "base_value": 55000,
+    "description": "Military-spec M4A1. Most mod slots of any weapon."
   }
 ]

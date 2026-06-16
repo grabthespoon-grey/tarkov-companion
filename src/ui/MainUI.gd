@@ -345,17 +345,29 @@ func _refresh_inventory() -> void:
 		row.add_child(_label(item.get("rarity", "").to_upper(), rarity_color, 9))
 
 		var captured_item = item
-		var sell_btn = _button("SELL", C_PANEL)
-		sell_btn.custom_minimum_size = Vector2(42, 20)
-		sell_btn.pressed.connect(func(): GameManager.sell_item(captured_item))
-		row.add_child(sell_btn)
+		if item.get("category") == "weapon":
+			var equip_btn = _button("EQUIP", C_GREEN)
+			equip_btn.custom_minimum_size = Vector2(48, 20)
+			equip_btn.pressed.connect(func():
+				GameManager.equip_item(captured_item, "weapon")
+				_refresh_equipment()
+				_refresh_inventory()
+				if _gun_mod_panel.visible:
+					_refresh_gun_mod_panel()
+			)
+			row.add_child(equip_btn)
+		else:
+			var sell_btn = _button("SELL", C_PANEL)
+			sell_btn.custom_minimum_size = Vector2(42, 20)
+			sell_btn.pressed.connect(func(): GameManager.sell_item(captured_item))
+			row.add_child(sell_btn)
 
-		if item.get("steam_tradeable", false):
-			var def_id: int = item.get("steam_item_def", 0)
-			var trade_btn = _button("TRADE", C_BORDER)
-			trade_btn.custom_minimum_size = Vector2(48, 20)
-			trade_btn.pressed.connect(func(): SteamManager.open_market_listing(def_id))
-			row.add_child(trade_btn)
+			if item.get("steam_tradeable", false):
+				var def_id: int = item.get("steam_item_def", 0)
+				var trade_btn = _button("TRADE", C_BORDER)
+				trade_btn.custom_minimum_size = Vector2(48, 20)
+				trade_btn.pressed.connect(func(): SteamManager.open_market_listing(def_id))
+				row.add_child(trade_btn)
 
 func _refresh_gun_mod_panel() -> void:
 	for c in _gun_mod_slots_vbox.get_children(): c.queue_free()
