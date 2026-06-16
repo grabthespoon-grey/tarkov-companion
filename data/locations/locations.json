@@ -28,7 +28,10 @@
       { "item_id": "m4_standard_bcg_t1",      "weight": 0.04 },
       { "item_id": "m4_standard_ch_t1",       "weight": 0.03 },
       { "item_id": "holosun_hs510c",          "weight": 0.04 },
-      { "item_id": "mp5_drop",               "weight": 0.06 }
+      { "item_id": "mp5_drop",               "weight": 0.06 },
+      { "item_id": "magpul_moe_grip_t2",     "weight": 0.03 },
+      { "item_id": "ak74_45rd_mag_t2",       "weight": 0.03 },
+      { "item_id": "m4_magpul_moe_t2",       "weight": 0.03 }
     ]
   },
   {
@@ -61,7 +64,10 @@
       { "item_id": "m4_raptor_ch_t2",        "weight": 0.04 },
       { "item_id": "mp5_drop",               "weight": 0.04 },
       { "item_id": "ak74_drop",              "weight": 0.04 },
-      { "item_id": "m4a1_drop",              "weight": 0.02 }
+      { "item_id": "m4a1_drop",              "weight": 0.02 },
+      { "item_id": "hogue_grip_t3",          "weight": 0.03 },
+      { "item_id": "eotech_553_t3",          "weight": 0.03 },
+      { "item_id": "ak_dtk_1_suppressor",    "weight": 0.03 }
     ]
   },
   {
@@ -94,7 +100,10 @@
       { "item_id": "m4_bcm_ch_t3",           "weight": 0.04 },
       { "item_id": "ak74_drop",              "weight": 0.06 },
       { "item_id": "m4a1_drop",              "weight": 0.05 },
-      { "item_id": "mp5_drop",              "weight": 0.02 }
+      { "item_id": "mp5_drop",              "weight": 0.02 },
+      { "item_id": "elcan_specter_dr",       "weight": 0.03 },
+      { "item_id": "tango_down_grip_t4",     "weight": 0.03 },
+      { "item_id": "ak74_zenitco_dtk4_t4",  "weight": 0.03 }
     ]
   },
   {
