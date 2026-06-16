@@ -42,11 +42,16 @@ func _ready() -> void:
 
 func _load_save() -> void:
 	SaveManager.load_game()
-	# Migrate saves that predate the ammo system
+	# Migrate: ammo system not in old saves
 	if "ammo" not in game_state:
 		game_state["ammo"] = {"9mm": 90, "7.62mm": 60, "5.56mm": 45}
 	if "ammo_penalty" not in game_state.operator:
 		game_state.operator["ammo_penalty"] = 0.0
+	# Migrate: old saves had null weapon slot (before MP5 default was added)
+	if game_state.equipment.get("weapon") == null:
+		game_state.equipment["weapon"] = {
+			"type_id": "mp5", "name": "MP5", "condition": 100.0, "mods": {},
+		}
 
 func get_farming_efficiency() -> float:
 	return EquipmentSystem.calculate_efficiency(game_state.equipment)
