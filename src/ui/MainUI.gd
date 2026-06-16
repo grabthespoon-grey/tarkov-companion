@@ -24,7 +24,9 @@ var _location_btns:  Array[Button] = []
 var _equip_bars:     Dictionary = {}
 var _inventory_list: VBoxContainer
 var _selected_location: String = "factory"
-var _gun_mod_panel:  Control
+var _gun_mod_panel:       Control
+var _gun_mod_slots_vbox:  VBoxContainer
+var _gun_mod_stats_vbox:  VBoxContainer
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -187,44 +189,69 @@ func _add_inventory_panel(parent: Control) -> void:
 # ── Gun Mod Panel ──────────────────────────────────────────────────────────
 
 func _build_gun_mod_panel() -> Control:
+	# Dark background — click anywhere outside the panel to close
 	var overlay = ColorRect.new()
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.color = Color(0, 0, 0, 0.85)
+	overlay.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed:
+			_gun_mod_panel.hide()
+	)
 
-	var container = VBoxContainer.new()
-	container.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	container.custom_minimum_size = Vector2(440, 500)
-	overlay.add_child(container)
+	# CenterContainer handles centering without PRESET_CENTER quirks
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_PASS
+	overlay.add_child(center)
 
+	# Actual dialog panel — MOUSE_FILTER_STOP prevents clicks bubbling to overlay
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(440, 460)
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel.add_theme_stylebox_override("panel", _make_stylebox(C_PANEL, C_BORDER))
+	center.add_child(panel)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	panel.add_child(vbox)
+
+	# Header row with title + close button
 	var hdr = HBoxContainer.new()
 	hdr.add_theme_constant_override("separation", 8)
-	container.add_child(hdr)
+	vbox.add_child(hdr)
+
 	var title = _label("GUN WORKSHOP", C_ACCENT, 13)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hdr.add_child(title)
+
+	var hint = _label("ESC / click outside to close", C_DIM, 9)
+	hdr.add_child(hint)
+
 	var close_btn = _button("✕", C_RED)
 	close_btn.custom_minimum_size = Vector2(28, 28)
 	close_btn.pressed.connect(func(): _gun_mod_panel.hide())
 	hdr.add_child(close_btn)
 
+	# Body: left = slots, right = stats
 	var body = HSplitContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	container.add_child(body)
+	vbox.add_child(body)
 
-	# Left: weapon slots
-	var slots_vbox = VBoxContainer.new()
-	slots_vbox.add_theme_constant_override("separation", 6)
-	slots_vbox.custom_minimum_size.x = 200
-	body.add_child(slots_vbox)
-	slots_vbox.set_meta("slots_container", true)
+	_gun_mod_slots_vbox = VBoxContainer.new()
+	_gun_mod_slots_vbox.add_theme_constant_override("separation", 6)
+	_gun_mod_slots_vbox.custom_minimum_size.x = 220
+	body.add_child(_gun_mod_slots_vbox)
 
-	# Right: stats
-	var stats_vbox = VBoxContainer.new()
-	stats_vbox.add_theme_constant_override("separation", 4)
-	body.add_child(stats_vbox)
-	stats_vbox.set_meta("stats_container", true)
+	_gun_mod_stats_vbox = VBoxContainer.new()
+	_gun_mod_stats_vbox.add_theme_constant_override("separation", 4)
+	body.add_child(_gun_mod_stats_vbox)
 
 	return overlay
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") and _gun_mod_panel.visible:
+		_gun_mod_panel.hide()
+		get_viewport().set_input_as_handled()
 
 # ── Signal Handlers ────────────────────────────────────────────────────────
 
@@ -333,27 +360,20 @@ func _refresh_inventory() -> void:
 			row.add_child(trade_btn)
 
 func _refresh_gun_mod_panel() -> void:
-	var overlay: Control = _gun_mod_panel
-	var container = overlay.get_child(0)
-	var body: HSplitContainer = container.get_child(1)
-
-	var slots_vbox: VBoxContainer = body.get_child(0)
-	var stats_vbox: VBoxContainer = body.get_child(1)
-
-	for c in slots_vbox.get_children(): c.queue_free()
-	for c in stats_vbox.get_children(): c.queue_free()
+	for c in _gun_mod_slots_vbox.get_children(): c.queue_free()
+	for c in _gun_mod_stats_vbox.get_children(): c.queue_free()
 
 	var weapon = GameManager.game_state.equipment.get("weapon")
 	if weapon == null:
-		slots_vbox.add_child(_label("No weapon equipped", C_DIM, 10))
+		_gun_mod_slots_vbox.add_child(_label("No weapon equipped", C_DIM, 10))
 		return
 
-	slots_vbox.add_child(_label(weapon.get("name", "?").to_upper(), C_ACCENT, 11))
+	_gun_mod_slots_vbox.add_child(_label(weapon.get("name", "?").to_upper(), C_ACCENT, 11))
 
 	for slot in GunModSystem.get_available_slots(weapon):
 		var row = HBoxContainer.new()
 		row.add_theme_constant_override("separation", 4)
-		slots_vbox.add_child(row)
+		_gun_mod_slots_vbox.add_child(row)
 
 		var slot_lbl = _label(slot.to_upper().replace("_", " "), C_DIM, 9)
 		slot_lbl.custom_minimum_size.x = 80
@@ -379,13 +399,13 @@ func _refresh_gun_mod_panel() -> void:
 			row.add_child(empty_lbl)
 
 	# Available compatible mods
-	slots_vbox.add_child(_label("AVAILABLE MODS", C_ACCENT, 10))
+	_gun_mod_slots_vbox.add_child(_label("AVAILABLE MODS", C_ACCENT, 10))
 	var compatible = GunModSystem.get_compatible_mods(weapon, GameManager.game_state.inventory)
 	if compatible.is_empty():
-		slots_vbox.add_child(_label("No compatible mods in inventory", C_DIM, 9))
+		_gun_mod_slots_vbox.add_child(_label("No compatible mods in inventory", C_DIM, 9))
 	for mod in compatible:
 		var row = HBoxContainer.new()
-		slots_vbox.add_child(row)
+		_gun_mod_slots_vbox.add_child(row)
 		var n = _label(mod.get("name", "?"), C_TEXT, 9)
 		n.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(n)
@@ -400,13 +420,13 @@ func _refresh_gun_mod_panel() -> void:
 		row.add_child(att_btn)
 
 	# Stats
-	stats_vbox.add_child(_label("STATS", C_ACCENT, 11))
+	_gun_mod_stats_vbox.add_child(_label("STATS", C_ACCENT, 11))
 	var stats = GunModSystem.calculate_weapon_stats(weapon)
 	var stat_order = ["damage", "accuracy", "ergonomics", "recoil_vertical", "recoil_horizontal", "fire_rate"]
 	for stat in stat_order:
 		if stat in stats:
 			var row = HBoxContainer.new()
-			stats_vbox.add_child(row)
+			_gun_mod_stats_vbox.add_child(row)
 			var k = _label(stat.replace("_", " ").to_upper(), C_DIM, 9)
 			k.custom_minimum_size.x = 90
 			row.add_child(k)
