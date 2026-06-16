@@ -1,0 +1,43 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
+[application]
+
+config/name="TarkovCompanion"
+config/description="Desktop Companion Idle Game - Tarkov Style"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[autoload]
+
+GameManager="*res://src/core/GameManager.gd"
+TimeManager="*res://src/core/TimeManager.gd"
+SaveManager="*res://src/core/SaveManager.gd"
+LootSystem="*res://src/systems/LootSystem.gd"
+EquipmentSystem="*res://src/systems/EquipmentSystem.gd"
+GunModSystem="*res://src/systems/GunModSystem.gd"
+SteamManager="*res://src/steam/SteamManager.gd"
+
+[display]
+
+window/size/viewport_width=480
+window/size/viewport_height=700
+window/size/resizable=false
+window/stretch/mode="canvas_items"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

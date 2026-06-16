@@ -1,0 +1,18 @@
+# Godot 4
+.godot/
+*.translation
+*.import
+
+# Export
+export/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / tooling
+.claude/
+.omc/
+
+# Save data (user-specific)
+*.save

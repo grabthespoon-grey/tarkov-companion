@@ -1,0 +1,63 @@
+[
+  {
+    "id": "ak74",
+    "name": "AK-74",
+    "base_stats": {
+      "damage": 45,
+      "accuracy": 55,
+      "ergonomics": 44,
+      "recoil_vertical": 120,
+      "recoil_horizontal": 250,
+      "fire_rate": 600
+    },
+    "mod_slots": {
+      "muzzle": ["muzzle_brake", "suppressor", "flash_hider", "compensator"],
+      "stock": ["folding_stock", "fixed_stock", "skeleton_stock"],
+      "pistol_grip": ["standard_grip", "tactical_grip"],
+      "handguard": ["standard_handguard", "railed_handguard", "mlok_handguard"],
+      "scope_mount": ["iron_sights", "red_dot", "reflex_sight", "scope_4x", "scope_6x"],
+      "magazine": ["ak_30rd_mag", "ak_45rd_mag", "ak_drum_mag_75rd"]
+    }
+  },
+  {
+    "id": "m4a1",
+    "name": "M4A1",
+    "base_stats": {
+      "damage": 41,
+      "accuracy": 65,
+      "ergonomics": 62,
+      "recoil_vertical": 90,
+      "recoil_horizontal": 180,
+      "fire_rate": 800
+    },
+    "mod_slots": {
+      "muzzle": ["muzzle_brake", "suppressor", "flash_hider", "compensator"],
+      "stock": ["m4_stock", "m4_prs_stock", "m4_ctr_stock"],
+      "pistol_grip": ["standard_grip", "moe_grip", "bad_grip"],
+      "handguard": ["standard_handguard", "mlok_handguard", "keymod_handguard"],
+      "scope_mount": ["iron_sights", "red_dot", "reflex_sight", "scope_4x", "acog"],
+      "magazine": ["m4_30rd_mag", "m4_60rd_mag", "m4_drum_mag_100rd"],
+      "bcg": ["standard_bcg", "enhanced_bcg"],
+      "charging_handle": ["standard_ch", "ambidextrous_ch"]
+    }
+  },
+  {
+    "id": "mp5",
+    "name": "MP5",
+    "base_stats": {
+      "damage": 33,
+      "accuracy": 60,
+      "ergonomics": 78,
+      "recoil_vertical": 60,
+      "recoil_horizontal": 100,
+      "fire_rate": 850
+    },
+    "mod_slots": {
+      "muzzle": ["suppressor", "flash_hider", "muzzle_brake"],
+      "stock": ["folding_stock", "fixed_stock"],
+      "pistol_grip": ["standard_grip"],
+      "scope_mount": ["iron_sights", "red_dot"],
+      "magazine": ["mp5_30rd_mag", "mp5_15rd_mag", "mp5_drum_mag_50rd"]
+    }
+  }
+]

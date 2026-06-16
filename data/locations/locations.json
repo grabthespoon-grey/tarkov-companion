@@ -1,0 +1,89 @@
+[
+  {
+    "id": "factory",
+    "name": "Abandoned Factory",
+    "description": "Industrial complex overrun with scavengers. Good starting zone.",
+    "danger_level": 0.20,
+    "min_time_minutes": 8,
+    "max_time_minutes": 15,
+    "min_loot": 1,
+    "max_loot": 3,
+    "min_rubles": 100,
+    "max_rubles": 500,
+    "unlock_requirement": null,
+    "loot_table": [
+      { "item_id": "ak_74_muzzle_brake",    "weight": 0.30 },
+      { "item_id": "holosun_hs510c",         "weight": 0.20 },
+      { "item_id": "ak_magpul_zhukov_stock", "weight": 0.18 },
+      { "item_id": "m4_60rd_mag",            "weight": 0.14 },
+      { "item_id": "ak_drum_75rd",           "weight": 0.10 },
+      { "item_id": "m4_phase5_rail",         "weight": 0.06 },
+      { "item_id": "ak_dtk_1_suppressor",    "weight": 0.02 }
+    ]
+  },
+  {
+    "id": "customs",
+    "name": "Customs District",
+    "description": "Former shipping yard. High PMC traffic, better loot.",
+    "danger_level": 0.40,
+    "min_time_minutes": 12,
+    "max_time_minutes": 22,
+    "min_loot": 2,
+    "max_loot": 5,
+    "min_rubles": 300,
+    "max_rubles": 1200,
+    "unlock_requirement": { "level": 3 },
+    "loot_table": [
+      { "item_id": "m4_phase5_rail",         "weight": 0.22 },
+      { "item_id": "holosun_hs510c",         "weight": 0.18 },
+      { "item_id": "ak_magpul_zhukov_stock", "weight": 0.16 },
+      { "item_id": "ak_dtk_1_suppressor",    "weight": 0.12 },
+      { "item_id": "m4_60rd_mag",            "weight": 0.12 },
+      { "item_id": "m4_bcg_enhanced",        "weight": 0.10 },
+      { "item_id": "elcan_specter_dr",       "weight": 0.06 },
+      { "item_id": "mp5_gso_suppressor",     "weight": 0.04 }
+    ]
+  },
+  {
+    "id": "woods",
+    "name": "Northern Woods",
+    "description": "Dense forest with scattered military caches. High risk, high reward.",
+    "danger_level": 0.60,
+    "min_time_minutes": 18,
+    "max_time_minutes": 35,
+    "min_loot": 3,
+    "max_loot": 6,
+    "min_rubles": 600,
+    "max_rubles": 2500,
+    "unlock_requirement": { "level": 6 },
+    "loot_table": [
+      { "item_id": "elcan_specter_dr",       "weight": 0.18 },
+      { "item_id": "m4_bcg_enhanced",        "weight": 0.15 },
+      { "item_id": "mp5_gso_suppressor",     "weight": 0.14 },
+      { "item_id": "ak_dtk_1_suppressor",    "weight": 0.16 },
+      { "item_id": "m4_phase5_rail",         "weight": 0.16 },
+      { "item_id": "ak_drum_75rd",           "weight": 0.12 },
+      { "item_id": "holosun_hs510c",         "weight": 0.09 }
+    ]
+  },
+  {
+    "id": "lab",
+    "name": "Underground Lab",
+    "description": "Classified research facility. Extreme danger. Top-tier loot only.",
+    "danger_level": 0.80,
+    "min_time_minutes": 25,
+    "max_time_minutes": 45,
+    "min_loot": 4,
+    "max_loot": 8,
+    "min_rubles": 1500,
+    "max_rubles": 6000,
+    "unlock_requirement": { "level": 10 },
+    "loot_table": [
+      { "item_id": "elcan_specter_dr",       "weight": 0.28 },
+      { "item_id": "m4_bcg_enhanced",        "weight": 0.22 },
+      { "item_id": "mp5_gso_suppressor",     "weight": 0.20 },
+      { "item_id": "ak_dtk_1_suppressor",    "weight": 0.18 },
+      { "item_id": "ak_drum_75rd",           "weight": 0.12 }
+    ]
+  }
+]
