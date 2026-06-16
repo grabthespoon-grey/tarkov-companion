@@ -362,6 +362,10 @@ func _refresh_inventory() -> void:
 					_refresh_gun_mod_panel()
 			)
 			row.add_child(equip_btn)
+			var w_sell_btn = _button("SELL", C_PANEL)
+			w_sell_btn.custom_minimum_size = Vector2(42, 20)
+			w_sell_btn.pressed.connect(func(): GameManager.sell_item(captured_item))
+			row.add_child(w_sell_btn)
 		else:
 			var sell_btn = _button("SELL", C_PANEL)
 			sell_btn.custom_minimum_size = Vector2(42, 20)
