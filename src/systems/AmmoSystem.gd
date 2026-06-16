@@ -78,7 +78,7 @@ func buy_ammo(ammo_type: String) -> bool:
 		return false
 	GameManager.game_state.rubles -= cfg["buy_cost_per_30"]
 	var ammo: Dictionary = GameManager.game_state.get("ammo", {})
-	var new_count := ammo.get(ammo_type, 0) + 30
+	var new_count: int = int(ammo.get(ammo_type, 0)) + 30
 	ammo[ammo_type] = new_count
 	emit_signal("ammo_changed", ammo_type, new_count)
 	GameManager.rubles_changed.emit(GameManager.game_state.rubles)
