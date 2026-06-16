@@ -18,8 +18,8 @@ func _load_configs() -> void:
 func get_weapon_config(type_id: String) -> Dictionary:
 	return _weapon_configs.get(type_id, {})
 
-func can_attach_mod(weapon: Dictionary, mod: Dictionary) -> bool:
-	if weapon == null or mod == null:
+func can_attach_mod(weapon, mod) -> bool:
+	if not weapon is Dictionary or not mod is Dictionary:
 		return false
 	var config = _weapon_configs.get(weapon.get("type_id", ""), {})
 	if config.is_empty():
@@ -28,35 +28,34 @@ func can_attach_mod(weapon: Dictionary, mod: Dictionary) -> bool:
 	var allowed = config.get("mod_slots", {}).get(slot_type, [])
 	return mod.get("mod_type", "") in allowed
 
-func attach_mod(weapon: Dictionary, mod: Dictionary) -> bool:
+func attach_mod(weapon, mod) -> bool:
 	if not can_attach_mod(weapon, mod):
 		return false
 	var slot = mod.get("category", "")
 	if "mods" not in weapon:
 		weapon["mods"] = {}
-	# Return displaced mod to inventory
 	if slot in weapon["mods"]:
 		GameManager.game_state.inventory.append(weapon["mods"][slot])
 	weapon["mods"][slot] = mod
 	GameManager.game_state.inventory.erase(mod)
 	return true
 
-func detach_mod(weapon: Dictionary, slot: String) -> Dictionary:
-	if "mods" not in weapon or slot not in weapon["mods"]:
+func detach_mod(weapon, slot: String) -> Dictionary:
+	if not weapon is Dictionary or "mods" not in weapon or slot not in weapon["mods"]:
 		return {}
 	var mod = weapon["mods"][slot]
 	weapon["mods"].erase(slot)
 	GameManager.game_state.inventory.append(mod)
 	return mod
 
-func get_available_slots(weapon: Dictionary) -> Array:
-	if weapon == null:
+func get_available_slots(weapon) -> Array:
+	if not weapon is Dictionary:
 		return []
 	var config = _weapon_configs.get(weapon.get("type_id", ""), {})
 	return config.get("mod_slots", {}).keys()
 
-func calculate_weapon_stats(weapon: Dictionary) -> Dictionary:
-	if weapon == null:
+func calculate_weapon_stats(weapon) -> Dictionary:
+	if not weapon is Dictionary:
 		return {}
 	var config = _weapon_configs.get(weapon.get("type_id", ""), {})
 	var stats = config.get("base_stats", {}).duplicate(true)
@@ -67,13 +66,13 @@ func calculate_weapon_stats(weapon: Dictionary) -> Dictionary:
 				stats[stat] += mod["stats"][stat]
 	return stats
 
-func calculate_efficiency_bonus(weapon: Dictionary) -> float:
-	if weapon == null:
+func calculate_efficiency_bonus(weapon) -> float:
+	if not weapon is Dictionary:
 		return 0.0
 	var stats = calculate_weapon_stats(weapon)
 	var acc = stats.get("accuracy", 0) / 1000.0
 	var erg = stats.get("ergonomics", 0) / 2000.0
 	return clampf(acc + erg, 0.0, 0.5)
 
-func get_compatible_mods(weapon: Dictionary, inventory: Array) -> Array:
+func get_compatible_mods(weapon, inventory: Array) -> Array:
 	return inventory.filter(func(item): return can_attach_mod(weapon, item))

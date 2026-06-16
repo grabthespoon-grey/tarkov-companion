@@ -263,7 +263,7 @@ func _on_operator_returned(_result: Dictionary) -> void:
 
 func _on_farm_progress(progress: float, time_remaining: int) -> void:
 	_raid_progress.value = progress
-	var mins: int = time_remaining / 60
+	var mins: int = floori(time_remaining / 60.0)
 	var secs: int = time_remaining % 60
 	_raid_timer_label.text = "%02d:%02d" % [mins, secs]
 
