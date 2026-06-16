@@ -139,7 +139,7 @@ func _add_location_panel(parent: Control) -> void:
 	for loc in LootSystem.get_all_locations():
 		var btn = _button(loc.get("name", "?").split(" ")[0].to_upper(), C_PANEL)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.meta_set("location_id", loc.get("id", ""))
+		btn.set_meta("location_id", loc.get("id", ""))
 		btn.pressed.connect(_on_location_selected.bind(loc.get("id", ""), btn))
 		hbox.add_child(btn)
 		_location_btns.append(btn)
@@ -253,7 +253,7 @@ func _on_operator_deployed(_loc_id: String) -> void:
 	var loc = LootSystem.get_location(_selected_location)
 	_raid_label.text = "RAID: %s" % loc.get("name", "Unknown").to_upper()
 
-func _on_operator_returned(result: Dictionary) -> void:
+func _on_operator_returned(_result: Dictionary) -> void:
 	_deploy_btn.disabled = false
 	_status_label.text = "● READY"
 	_status_label.add_theme_color_override("font_color", C_GREEN)
@@ -263,8 +263,8 @@ func _on_operator_returned(result: Dictionary) -> void:
 
 func _on_farm_progress(progress: float, time_remaining: int) -> void:
 	_raid_progress.value = progress
-	var mins = time_remaining / 60
-	var secs = time_remaining % 60
+	var mins: int = time_remaining / 60
+	var secs: int = time_remaining % 60
 	_raid_timer_label.text = "%02d:%02d" % [mins, secs]
 
 func _on_gun_mod_pressed() -> void:
@@ -420,11 +420,11 @@ func _panel(parent: Control, bg_color: Color = C_PANEL) -> PanelContainer:
 	parent.add_child(p)
 	return p
 
-func _label(text: String, color: Color, size: int) -> Label:
+func _label(text: String, color: Color, font_size: int) -> Label:
 	var l = Label.new()
 	l.text = text
 	l.add_theme_color_override("font_color", color)
-	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_font_size_override("font_size", font_size)
 	return l
 
 func _button(text: String, bg: Color) -> Button:
