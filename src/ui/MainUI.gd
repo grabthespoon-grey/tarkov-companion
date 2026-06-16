@@ -341,8 +341,14 @@ func _refresh_inventory() -> void:
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(name_lbl)
 
-		var rarity_color := _rarity_color(item.get("rarity", "common"))
-		row.add_child(_label(item.get("rarity", "").to_upper(), rarity_color, 9))
+		var tier: int = item.get("tier", 0)
+		if tier >= 1 and item.get("category", "") != "weapon":
+			var tier_lbl = _label("T%d" % tier, _tier_color(tier), 9)
+			tier_lbl.custom_minimum_size.x = 20
+			row.add_child(tier_lbl)
+		else:
+			var rarity_color := _rarity_color(item.get("rarity", "common"))
+			row.add_child(_label(item.get("rarity", "").to_upper(), rarity_color, 9))
 
 		var captured_item = item
 		if item.get("category") == "weapon":
@@ -369,6 +375,10 @@ func _refresh_inventory() -> void:
 				trade_btn.pressed.connect(func(): SteamManager.open_market_listing(def_id))
 				row.add_child(trade_btn)
 
+func _tier_color(tier: int) -> Color:
+	var rarities := ["", "common", "uncommon", "rare", "epic"]
+	return _rarity_color(rarities[tier] if tier >= 1 and tier <= 4 else "common")
+
 func _refresh_gun_mod_panel() -> void:
 	for c in _gun_mod_slots_vbox.get_children(): c.queue_free()
 	for c in _gun_mod_stats_vbox.get_children(): c.queue_free()
@@ -381,7 +391,7 @@ func _refresh_gun_mod_panel() -> void:
 	_gun_mod_slots_vbox.add_child(_label(weapon.get("name", "?").to_upper(), C_ACCENT, 11))
 
 	for slot in GunModSystem.get_available_slots(weapon):
-		var captured_slot: String = slot  # explicit capture to avoid closure bug
+		var captured_slot: String = slot
 		var row = HBoxContainer.new()
 		row.add_theme_constant_override("separation", 4)
 		_gun_mod_slots_vbox.add_child(row)
@@ -392,9 +402,18 @@ func _refresh_gun_mod_panel() -> void:
 
 		var mods: Dictionary = weapon.get("mods", {})
 		if slot in mods:
-			var mod_name = _label(mods[slot].get("name", "?"), C_TEXT, 9)
+			var equipped_mod: Dictionary = mods[slot]
+			var mod_name = _label(equipped_mod.get("name", "?"), C_TEXT, 9)
 			mod_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(mod_name)
+
+			var tier: int = equipped_mod.get("tier", 0)
+			var tier_lbl = _label("T%d" % tier, _tier_color(tier), 8)
+			tier_lbl.custom_minimum_size.x = 18
+			row.add_child(tier_lbl)
+
+			var bonus_pct := int(equipped_mod.get("efficiency_bonus", 0.0) * 100.0)
+			row.add_child(_label("+%d%%" % bonus_pct, C_GREEN, 8))
 
 			var det_btn = _button("✕", C_RED)
 			det_btn.custom_minimum_size = Vector2(22, 22)
@@ -416,7 +435,7 @@ func _refresh_gun_mod_panel() -> void:
 		_gun_mod_slots_vbox.add_child(_label("No compatible mods in inventory", C_DIM, 9))
 
 	for mod in compatible:
-		var captured_mod = mod  # explicit capture to avoid closure bug
+		var captured_mod = mod
 		var row = HBoxContainer.new()
 		row.add_theme_constant_override("separation", 4)
 		_gun_mod_slots_vbox.add_child(row)
@@ -424,6 +443,14 @@ func _refresh_gun_mod_panel() -> void:
 		var n = _label(mod.get("name", "?"), C_TEXT, 9)
 		n.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(n)
+
+		var tier: int = mod.get("tier", 0)
+		var tier_lbl = _label("T%d" % tier, _tier_color(tier), 8)
+		tier_lbl.custom_minimum_size.x = 18
+		row.add_child(tier_lbl)
+
+		var bonus_pct := int(mod.get("efficiency_bonus", 0.0) * 100.0)
+		row.add_child(_label("+%d%%" % bonus_pct, C_GREEN, 8))
 
 		var att_btn = _button("ATTACH", C_GREEN)
 		att_btn.custom_minimum_size = Vector2(55, 22)
@@ -435,17 +462,30 @@ func _refresh_gun_mod_panel() -> void:
 		)
 		row.add_child(att_btn)
 
-	_gun_mod_stats_vbox.add_child(_label("STATS", C_ACCENT, 11))
-	var stats := GunModSystem.calculate_weapon_stats(weapon)
-	for stat in ["damage", "accuracy", "ergonomics", "recoil_vertical", "recoil_horizontal", "fire_rate"]:
-		if stat not in stats:
+	_gun_mod_stats_vbox.add_child(_label("EFFICIENCY", C_ACCENT, 11))
+	var total_bonus := 0.0
+	for slot in GunModSystem.get_available_slots(weapon):
+		var mods: Dictionary = weapon.get("mods", {})
+		if slot not in mods:
 			continue
+		var m: Dictionary = mods[slot]
+		var bonus: float = m.get("efficiency_bonus", 0.0)
+		total_bonus += bonus
 		var row = HBoxContainer.new()
 		_gun_mod_stats_vbox.add_child(row)
-		var k = _label(stat.replace("_", " ").to_upper(), C_DIM, 9)
+		var k = _label(slot.replace("_", " ").to_upper(), C_DIM, 9)
 		k.custom_minimum_size.x = 90
 		row.add_child(k)
-		row.add_child(_label(str(stats[stat]), C_TEXT, 9))
+		var tier: int = m.get("tier", 0)
+		row.add_child(_label("T%d  +%d%%" % [tier, int(bonus * 100.0)], _tier_color(tier), 9))
+
+	var eff_row = HBoxContainer.new()
+	_gun_mod_stats_vbox.add_child(eff_row)
+	var total_lbl = _label("TOTAL", C_ACCENT, 9)
+	total_lbl.custom_minimum_size.x = 90
+	eff_row.add_child(total_lbl)
+	var eff_pct := clampf(1.0 + total_bonus, 1.0, 1.5) * 100.0
+	eff_row.add_child(_label("%.0f%%" % eff_pct, C_ACCENT, 9))
 
 # ── UI Helpers ─────────────────────────────────────────────────────────────
 

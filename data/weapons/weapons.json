@@ -33,7 +33,7 @@
     "mod_slots": {
       "muzzle": ["muzzle_brake", "suppressor", "flash_hider", "compensator"],
       "stock": ["m4_stock", "m4_prs_stock", "m4_ctr_stock"],
-      "pistol_grip": ["standard_grip", "moe_grip", "bad_grip"],
+      "pistol_grip": ["standard_grip", "moe_grip", "bad_grip", "tactical_grip"],
       "handguard": ["standard_handguard", "mlok_handguard", "keymod_handguard"],
       "scope_mount": ["iron_sights", "red_dot", "reflex_sight", "scope_4x", "acog"],
       "magazine": ["m4_30rd_mag", "m4_60rd_mag", "m4_drum_mag_100rd"],
@@ -55,7 +55,7 @@
     "mod_slots": {
       "muzzle": ["suppressor", "flash_hider", "muzzle_brake"],
       "stock": ["folding_stock", "fixed_stock"],
-      "pistol_grip": ["standard_grip"],
+      "pistol_grip": ["standard_grip", "tactical_grip"],
       "scope_mount": ["iron_sights", "red_dot"],
       "magazine": ["mp5_30rd_mag", "mp5_15rd_mag", "mp5_drum_mag_50rd"]
     }

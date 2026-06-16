@@ -1,133 +1,932 @@
 [
   {
+    "id": "ak74_flash_hider_t1",
+    "name": "AK-74 A2 Flash Hider",
+    "category": "muzzle",
+    "mod_type": "flash_hider",
+    "tier": 1,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1011,
+    "base_value": 800
+  },
+  {
     "id": "ak_74_muzzle_brake",
     "name": "AK-74 Muzzle Brake 6P20",
     "category": "muzzle",
     "mod_type": "muzzle_brake",
-    "compatible_weapons": ["ak74"],
-    "stats": { "recoil_vertical": -12, "recoil_horizontal": -8, "ergonomics": -1, "accuracy": 3 },
-    "rarity": "common",
+    "tier": 2,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1001,
-    "base_value": 1500,
-    "description": "Standard AK-74 muzzle brake. Reliable recoil control."
+    "base_value": 1500
   },
   {
     "id": "ak_dtk_1_suppressor",
-    "name": "AK DTK-1 Suppressor 7.62x39",
+    "name": "AK DTK-1 Suppressor",
     "category": "muzzle",
     "mod_type": "suppressor",
-    "compatible_weapons": ["ak74"],
-    "stats": { "recoil_vertical": -8, "recoil_horizontal": -5, "ergonomics": -12, "accuracy": 5, "noise_reduction": 30 },
+    "tier": 3,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.07,
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1002,
-    "base_value": 28000,
-    "description": "Tactical suppressor. Significantly reduces sound signature."
+    "base_value": 28000
   },
   {
-    "id": "m4_phase5_rail",
-    "name": "Phase 5 Tactical M-LOK Rail",
-    "category": "handguard",
-    "mod_type": "mlok_handguard",
-    "compatible_weapons": ["m4a1"],
-    "stats": { "ergonomics": 8, "accuracy": 5, "recoil_vertical": -5 },
-    "rarity": "uncommon",
-    "steam_tradeable": true,
-    "steam_item_def": 1003,
-    "base_value": 12000,
-    "description": "M-LOK compatible rail system. Significantly improves handling."
-  },
-  {
-    "id": "elcan_specter_dr",
-    "name": "Elcan SpecterDR 1x/4x Scope",
-    "category": "scope_mount",
-    "mod_type": "scope_4x",
-    "compatible_weapons": ["m4a1", "ak74"],
-    "stats": { "accuracy": 20, "ergonomics": -10, "recoil_vertical": -3 },
+    "id": "ak74_zenitco_dtk4_t4",
+    "name": "Zenitco DTK-4 Muzzle Brake",
+    "category": "muzzle",
+    "mod_type": "compensator",
+    "tier": 4,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.1,
     "rarity": "epic",
     "steam_tradeable": true,
-    "steam_item_def": 1004,
-    "base_value": 45000,
-    "description": "Premium dual-magnification combat scope. Highly sought after."
+    "steam_item_def": 1012,
+    "base_value": 52000
   },
   {
-    "id": "ak_magpul_zhukov_stock",
-    "name": "Magpul Zhukov-S Folding Stock",
-    "category": "stock",
-    "mod_type": "folding_stock",
-    "compatible_weapons": ["ak74"],
-    "stats": { "ergonomics": 14, "recoil_vertical": -6, "recoil_horizontal": -4, "accuracy": 2 },
+    "id": "m4_a2_flash_hider_t1",
+    "name": "M4 A2 Flash Hider",
+    "category": "muzzle",
+    "mod_type": "flash_hider",
+    "tier": 1,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1013,
+    "base_value": 700
+  },
+  {
+    "id": "m4_strike_jcomp_t2",
+    "name": "Strike Industries J-COMP",
+    "category": "muzzle",
+    "mod_type": "compensator",
+    "tier": 2,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.05,
     "rarity": "uncommon",
     "steam_tradeable": true,
-    "steam_item_def": 1005,
-    "base_value": 8500,
-    "description": "Lightweight folding stock. Significantly improves ergonomics."
+    "steam_item_def": 1014,
+    "base_value": 4500
   },
   {
-    "id": "m4_60rd_mag",
-    "name": "Surefire MAG5-60 60rd Magazine",
-    "category": "magazine",
-    "mod_type": "m4_60rd_mag",
-    "compatible_weapons": ["m4a1"],
-    "stats": { "ergonomics": -8, "recoil_vertical": 3 },
-    "rarity": "uncommon",
-    "steam_tradeable": true,
-    "steam_item_def": 1006,
-    "base_value": 6500,
-    "description": "Extended 60-round magazine. Doubles capacity, hurts ergonomics."
-  },
-  {
-    "id": "ak_drum_75rd",
-    "name": "RPK-16 Drum Magazine 95rd",
-    "category": "magazine",
-    "mod_type": "ak_drum_mag_75rd",
-    "compatible_weapons": ["ak74"],
-    "stats": { "ergonomics": -15, "recoil_vertical": 8, "recoil_horizontal": 5 },
+    "id": "m4_surefire_socom_t3",
+    "name": "SureFire SOCOM556RC2",
+    "category": "muzzle",
+    "mod_type": "suppressor",
+    "tier": 3,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.07,
     "rarity": "rare",
     "steam_tradeable": true,
-    "steam_item_def": 1007,
-    "base_value": 22000,
-    "description": "Large capacity drum magazine. Maximum suppressive firepower."
+    "steam_item_def": 1015,
+    "base_value": 42000
+  },
+  {
+    "id": "m4_aac_blackout_t4",
+    "name": "AAC BLACKOUT 51T Flash Hider",
+    "category": "muzzle",
+    "mod_type": "flash_hider",
+    "tier": 4,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1016,
+    "base_value": 68000
+  },
+  {
+    "id": "mp5_thread_protector_t1",
+    "name": "MP5 Thread Protector",
+    "category": "muzzle",
+    "mod_type": "flash_hider",
+    "tier": 1,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1017,
+    "base_value": 500
+  },
+  {
+    "id": "mp5_flash_hider_t2",
+    "name": "MP5 3-Lug Flash Hider",
+    "category": "muzzle",
+    "mod_type": "flash_hider",
+    "tier": 2,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1018,
+    "base_value": 3200
+  },
+  {
+    "id": "mp5_gso_suppressor",
+    "name": "SilencerCo Omega 9K",
+    "category": "muzzle",
+    "mod_type": "suppressor",
+    "tier": 3,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1010,
+    "base_value": 38000
+  },
+  {
+    "id": "mp5_bt_suppressor_t4",
+    "name": "B&T Rotex-IIC Suppressor",
+    "category": "muzzle",
+    "mod_type": "suppressor",
+    "tier": 4,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1019,
+    "base_value": 62000
+  },
+  {
+    "id": "iron_sights_t1",
+    "name": "Standard Iron Sights",
+    "category": "scope_mount",
+    "mod_type": "iron_sights",
+    "tier": 1,
+    "compatible_weapons": [
+      "ak74",
+      "m4a1",
+      "mp5"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1020,
+    "base_value": 300
   },
   {
     "id": "holosun_hs510c",
     "name": "Holosun HS510C Red Dot",
     "category": "scope_mount",
     "mod_type": "red_dot",
-    "compatible_weapons": ["m4a1", "ak74", "mp5"],
-    "stats": { "accuracy": 12, "ergonomics": -2 },
-    "rarity": "common",
+    "tier": 2,
+    "compatible_weapons": [
+      "ak74",
+      "m4a1",
+      "mp5"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
     "steam_tradeable": true,
     "steam_item_def": 1008,
-    "base_value": 9000,
-    "description": "Reliable open reflex sight. Fast target acquisition."
+    "base_value": 9000
+  },
+  {
+    "id": "eotech_553_t3",
+    "name": "EOTech 553 Holographic",
+    "category": "scope_mount",
+    "mod_type": "reflex_sight",
+    "tier": 3,
+    "compatible_weapons": [
+      "m4a1",
+      "ak74"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1021,
+    "base_value": 32000
+  },
+  {
+    "id": "elcan_specter_dr",
+    "name": "Elcan SpecterDR 1x/4x",
+    "category": "scope_mount",
+    "mod_type": "scope_4x",
+    "tier": 4,
+    "compatible_weapons": [
+      "m4a1",
+      "ak74"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1004,
+    "base_value": 45000
+  },
+  {
+    "id": "mp5_aimpoint_t4",
+    "name": "Aimpoint Micro T-2",
+    "category": "scope_mount",
+    "mod_type": "red_dot",
+    "tier": 4,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1022,
+    "base_value": 48000
+  },
+  {
+    "id": "ak74_standard_stock_t1",
+    "name": "AK-74 Standard Fixed Stock",
+    "category": "stock",
+    "mod_type": "fixed_stock",
+    "tier": 1,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1023,
+    "base_value": 600
+  },
+  {
+    "id": "ak74_magpul_moe_t2",
+    "name": "Magpul MOE AK Stock",
+    "category": "stock",
+    "mod_type": "fixed_stock",
+    "tier": 2,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1024,
+    "base_value": 5500
+  },
+  {
+    "id": "ak_magpul_zhukov_stock",
+    "name": "Magpul Zhukov-S Folding Stock",
+    "category": "stock",
+    "mod_type": "folding_stock",
+    "tier": 3,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1005,
+    "base_value": 8500
+  },
+  {
+    "id": "ak74_fab_defense_t4",
+    "name": "FAB Defense GL-CORE Stock",
+    "category": "stock",
+    "mod_type": "skeleton_stock",
+    "tier": 4,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1025,
+    "base_value": 35000
+  },
+  {
+    "id": "m4_standard_stock_t1",
+    "name": "M4 A2 Standard Stock",
+    "category": "stock",
+    "mod_type": "m4_stock",
+    "tier": 1,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1026,
+    "base_value": 700
+  },
+  {
+    "id": "m4_magpul_moe_t2",
+    "name": "Magpul MOE Carbine Stock",
+    "category": "stock",
+    "mod_type": "m4_ctr_stock",
+    "tier": 2,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1027,
+    "base_value": 4800
+  },
+  {
+    "id": "m4_magpul_prs_t3",
+    "name": "Magpul PRS Gen3 Stock",
+    "category": "stock",
+    "mod_type": "m4_prs_stock",
+    "tier": 3,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1028,
+    "base_value": 22000
+  },
+  {
+    "id": "m4_bcm_gunfighter_t4",
+    "name": "BCM Gunfighter Stock MOD0",
+    "category": "stock",
+    "mod_type": "m4_stock",
+    "tier": 4,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1029,
+    "base_value": 42000
+  },
+  {
+    "id": "mp5_standard_stock_t1",
+    "name": "MP5 Fixed Buttstock",
+    "category": "stock",
+    "mod_type": "fixed_stock",
+    "tier": 1,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1030,
+    "base_value": 500
+  },
+  {
+    "id": "mp5_folding_stock_t2",
+    "name": "MP5 Navy Folding Stock",
+    "category": "stock",
+    "mod_type": "folding_stock",
+    "tier": 2,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1031,
+    "base_value": 3800
+  },
+  {
+    "id": "mp5_magpul_stock_t3",
+    "name": "Magpul SL-K Stock MP5",
+    "category": "stock",
+    "mod_type": "folding_stock",
+    "tier": 3,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1032,
+    "base_value": 18000
+  },
+  {
+    "id": "mp5_sb_tactical_t4",
+    "name": "SB Tactical FS1913 Brace",
+    "category": "stock",
+    "mod_type": "folding_stock",
+    "tier": 4,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1033,
+    "base_value": 38000
+  },
+  {
+    "id": "ak74_30rd_mag_t1",
+    "name": "AK-74 Standard 30rd Magazine",
+    "category": "magazine",
+    "mod_type": "ak_30rd_mag",
+    "tier": 1,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1034,
+    "base_value": 800
+  },
+  {
+    "id": "ak74_45rd_mag_t2",
+    "name": "AK-74 45rd Extended Magazine",
+    "category": "magazine",
+    "mod_type": "ak_45rd_mag",
+    "tier": 2,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1035,
+    "base_value": 5200
+  },
+  {
+    "id": "ak_drum_75rd",
+    "name": "RPK-16 Drum Magazine 95rd",
+    "category": "magazine",
+    "mod_type": "ak_drum_mag_75rd",
+    "tier": 3,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1007,
+    "base_value": 22000
+  },
+  {
+    "id": "ak74_95rd_t4",
+    "name": "Molot 95rd Quad-Stack Magazine",
+    "category": "magazine",
+    "mod_type": "ak_drum_mag_75rd",
+    "tier": 4,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1036,
+    "base_value": 48000
+  },
+  {
+    "id": "m4_30rd_mag_t1",
+    "name": "M4 STANAG 30rd Magazine",
+    "category": "magazine",
+    "mod_type": "m4_30rd_mag",
+    "tier": 1,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1037,
+    "base_value": 600
+  },
+  {
+    "id": "m4_60rd_mag",
+    "name": "Surefire MAG5-60 60rd",
+    "category": "magazine",
+    "mod_type": "m4_60rd_mag",
+    "tier": 2,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1006,
+    "base_value": 6500
+  },
+  {
+    "id": "m4_100rd_drum_t3",
+    "name": "X Products X-15 50rd Drum",
+    "category": "magazine",
+    "mod_type": "m4_drum_mag_100rd",
+    "tier": 3,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1038,
+    "base_value": 28000
+  },
+  {
+    "id": "m4_150rd_beta_t4",
+    "name": "Beta-C 100rd Twin Drum",
+    "category": "magazine",
+    "mod_type": "m4_drum_mag_100rd",
+    "tier": 4,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1039,
+    "base_value": 55000
+  },
+  {
+    "id": "mp5_15rd_mag_t1",
+    "name": "MP5 15rd Standard Magazine",
+    "category": "magazine",
+    "mod_type": "mp5_15rd_mag",
+    "tier": 1,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1040,
+    "base_value": 400
+  },
+  {
+    "id": "mp5_30rd_mag_t2",
+    "name": "MP5 30rd Extended Magazine",
+    "category": "magazine",
+    "mod_type": "mp5_30rd_mag",
+    "tier": 2,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1041,
+    "base_value": 3500
+  },
+  {
+    "id": "mp5_50rd_drum_t3",
+    "name": "MP5 50rd Drum Magazine",
+    "category": "magazine",
+    "mod_type": "mp5_drum_mag_50rd",
+    "tier": 3,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1042,
+    "base_value": 18500
+  },
+  {
+    "id": "mp5_100rd_beta_t4",
+    "name": "MP5 Beta-C 100rd Drum",
+    "category": "magazine",
+    "mod_type": "mp5_drum_mag_50rd",
+    "tier": 4,
+    "compatible_weapons": [
+      "mp5"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1043,
+    "base_value": 42000
+  },
+  {
+    "id": "ak74_standard_hg_t1",
+    "name": "AK-74 Standard Handguard",
+    "category": "handguard",
+    "mod_type": "standard_handguard",
+    "tier": 1,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1044,
+    "base_value": 700
+  },
+  {
+    "id": "ak74_rs_regulate_t2",
+    "name": "RS Regulate AKM300 Rail",
+    "category": "handguard",
+    "mod_type": "railed_handguard",
+    "tier": 2,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1045,
+    "base_value": 7500
+  },
+  {
+    "id": "ak74_fab_defense_hg_t3",
+    "name": "FAB Defense UAS Handguard",
+    "category": "handguard",
+    "mod_type": "mlok_handguard",
+    "tier": 3,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1046,
+    "base_value": 24000
+  },
+  {
+    "id": "ak74_zenitco_b30_t4",
+    "name": "Zenitco B-30 Handguard",
+    "category": "handguard",
+    "mod_type": "mlok_handguard",
+    "tier": 4,
+    "compatible_weapons": [
+      "ak74"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1047,
+    "base_value": 52000
+  },
+  {
+    "id": "m4_standard_hg_t1",
+    "name": "M4 A2 Standard Handguard",
+    "category": "handguard",
+    "mod_type": "standard_handguard",
+    "tier": 1,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1048,
+    "base_value": 600
+  },
+  {
+    "id": "m4_bcm_rail_t2",
+    "name": "BCM MCMR Rail System",
+    "category": "handguard",
+    "mod_type": "mlok_handguard",
+    "tier": 2,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1049,
+    "base_value": 9500
+  },
+  {
+    "id": "m4_phase5_rail",
+    "name": "Phase 5 Tactical M-LOK Rail",
+    "category": "handguard",
+    "mod_type": "mlok_handguard",
+    "tier": 3,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1003,
+    "base_value": 12000
+  },
+  {
+    "id": "m4_geissele_mk16_t4",
+    "name": "Geissele MK16 URG-I Rail",
+    "category": "handguard",
+    "mod_type": "keymod_handguard",
+    "tier": 4,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1050,
+    "base_value": 58000
+  },
+  {
+    "id": "m4_standard_bcg_t1",
+    "name": "M4 Standard BCG",
+    "category": "bcg",
+    "mod_type": "standard_bcg",
+    "tier": 1,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1051,
+    "base_value": 1200
+  },
+  {
+    "id": "m4_bcg_mid_t2",
+    "name": "Aero Precision BCG",
+    "category": "bcg",
+    "mod_type": "standard_bcg",
+    "tier": 2,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1052,
+    "base_value": 8500
   },
   {
     "id": "m4_bcg_enhanced",
-    "name": "BCM Enhanced Bolt Carrier Group",
+    "name": "BCM Enhanced BCG",
     "category": "bcg",
     "mod_type": "enhanced_bcg",
-    "compatible_weapons": ["m4a1"],
-    "stats": { "recoil_vertical": -10, "recoil_horizontal": -8, "ergonomics": 3, "fire_rate": 50 },
+    "tier": 3,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.07,
     "rarity": "rare",
     "steam_tradeable": true,
     "steam_item_def": 1009,
-    "base_value": 32000,
-    "description": "Enhanced BCG with improved cycling reliability and recoil reduction."
+    "base_value": 32000
   },
   {
-    "id": "mp5_gso_suppressor",
-    "name": "SilencerCo Omega 9K Suppressor",
-    "category": "muzzle",
-    "mod_type": "suppressor",
-    "compatible_weapons": ["mp5"],
-    "stats": { "ergonomics": -8, "accuracy": 3, "noise_reduction": 35, "recoil_vertical": -5 },
+    "id": "m4_bcg_titanium_t4",
+    "name": "Cryptic Coatings Mystic BCG",
+    "category": "bcg",
+    "mod_type": "enhanced_bcg",
+    "tier": 4,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.1,
     "rarity": "epic",
     "steam_tradeable": true,
-    "steam_item_def": 1010,
-    "base_value": 38000,
-    "description": "Ultra-compact suppressor for 9mm. Best-in-class sound reduction."
+    "steam_item_def": 1053,
+    "base_value": 65000
+  },
+  {
+    "id": "standard_grip_t1",
+    "name": "Standard Pistol Grip",
+    "category": "pistol_grip",
+    "mod_type": "standard_grip",
+    "tier": 1,
+    "compatible_weapons": [
+      "ak74",
+      "m4a1",
+      "mp5"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1054,
+    "base_value": 400
+  },
+  {
+    "id": "magpul_moe_grip_t2",
+    "name": "Magpul MOE-K2 Grip",
+    "category": "pistol_grip",
+    "mod_type": "tactical_grip",
+    "tier": 2,
+    "compatible_weapons": [
+      "ak74",
+      "m4a1",
+      "mp5"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1055,
+    "base_value": 3200
+  },
+  {
+    "id": "hogue_grip_t3",
+    "name": "Hogue OverMolded Grip",
+    "category": "pistol_grip",
+    "mod_type": "tactical_grip",
+    "tier": 3,
+    "compatible_weapons": [
+      "ak74",
+      "m4a1",
+      "mp5"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1056,
+    "base_value": 12000
+  },
+  {
+    "id": "tango_down_grip_t4",
+    "name": "Tango Down Stubby Grip",
+    "category": "pistol_grip",
+    "mod_type": "tactical_grip",
+    "tier": 4,
+    "compatible_weapons": [
+      "ak74",
+      "m4a1",
+      "mp5"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1057,
+    "base_value": 28000
+  },
+  {
+    "id": "m4_standard_ch_t1",
+    "name": "M4 Standard Charging Handle",
+    "category": "charging_handle",
+    "mod_type": "standard_ch",
+    "tier": 1,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.03,
+    "rarity": "common",
+    "steam_tradeable": true,
+    "steam_item_def": 1058,
+    "base_value": 500
+  },
+  {
+    "id": "m4_raptor_ch_t2",
+    "name": "Radian Raptor Charging Handle",
+    "category": "charging_handle",
+    "mod_type": "ambidextrous_ch",
+    "tier": 2,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.05,
+    "rarity": "uncommon",
+    "steam_tradeable": true,
+    "steam_item_def": 1059,
+    "base_value": 4200
+  },
+  {
+    "id": "m4_bcm_ch_t3",
+    "name": "BCM Gunfighter Charging Handle",
+    "category": "charging_handle",
+    "mod_type": "ambidextrous_ch",
+    "tier": 3,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.07,
+    "rarity": "rare",
+    "steam_tradeable": true,
+    "steam_item_def": 1060,
+    "base_value": 15000
+  },
+  {
+    "id": "m4_geissele_ch_t4",
+    "name": "Geissele Super Charging Handle",
+    "category": "charging_handle",
+    "mod_type": "ambidextrous_ch",
+    "tier": 4,
+    "compatible_weapons": [
+      "m4a1"
+    ],
+    "efficiency_bonus": 0.1,
+    "rarity": "epic",
+    "steam_tradeable": true,
+    "steam_item_def": 1061,
+    "base_value": 32000
   },
   {
     "id": "mp5_drop",
@@ -137,8 +936,7 @@
     "mods": {},
     "rarity": "uncommon",
     "steam_tradeable": false,
-    "base_value": 20000,
-    "description": "Compact submachine gun. Sell if you already have one."
+    "base_value": 20000
   },
   {
     "id": "ak74_drop",
@@ -148,8 +946,7 @@
     "mods": {},
     "rarity": "rare",
     "steam_tradeable": false,
-    "base_value": 35000,
-    "description": "Fully functional AK-74. Equip to unlock AK mod slots."
+    "base_value": 35000
   },
   {
     "id": "m4a1_drop",
@@ -159,7 +956,6 @@
     "mods": {},
     "rarity": "epic",
     "steam_tradeable": false,
-    "base_value": 55000,
-    "description": "Military-spec M4A1. Most mod slots of any weapon."
+    "base_value": 55000
   }
 ]

@@ -69,10 +69,10 @@ func calculate_weapon_stats(weapon) -> Dictionary:
 func calculate_efficiency_bonus(weapon) -> float:
 	if not weapon is Dictionary:
 		return 0.0
-	var stats = calculate_weapon_stats(weapon)
-	var acc = stats.get("accuracy", 0) / 1000.0
-	var erg = stats.get("ergonomics", 0) / 2000.0
-	return clampf(acc + erg, 0.0, 0.5)
+	var total := 0.0
+	for _slot in weapon.get("mods", {}):
+		total += weapon["mods"][_slot].get("efficiency_bonus", 0.0)
+	return clampf(total, 0.0, 0.5)
 
 func get_compatible_mods(weapon, inventory: Array) -> Array:
 	return inventory.filter(func(item): return can_attach_mod(weapon, item))
