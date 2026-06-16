@@ -12,13 +12,14 @@
     "max_rubles": 500,
     "unlock_requirement": null,
     "loot_table": [
-      { "item_id": "ak_74_muzzle_brake",    "weight": 0.30 },
-      { "item_id": "holosun_hs510c",         "weight": 0.20 },
+      { "item_id": "ak_74_muzzle_brake",    "weight": 0.25 },
+      { "item_id": "holosun_hs510c",         "weight": 0.17 },
       { "item_id": "ak_magpul_zhukov_stock", "weight": 0.18 },
       { "item_id": "m4_60rd_mag",            "weight": 0.14 },
       { "item_id": "ak_drum_75rd",           "weight": 0.10 },
       { "item_id": "m4_phase5_rail",         "weight": 0.06 },
-      { "item_id": "ak_dtk_1_suppressor",    "weight": 0.02 }
+      { "item_id": "ak_dtk_1_suppressor",    "weight": 0.02 },
+      { "item_id": "mp5_drop",               "weight": 0.08 }
     ]
   },
   {
@@ -43,7 +44,8 @@
       { "item_id": "elcan_specter_dr",       "weight": 0.06 },
       { "item_id": "mp5_gso_suppressor",     "weight": 0.04 },
       { "item_id": "ak74_drop",              "weight": 0.05 },
-      { "item_id": "m4a1_drop",              "weight": 0.02 }
+      { "item_id": "m4a1_drop",              "weight": 0.02 },
+      { "item_id": "mp5_drop",               "weight": 0.04 }
     ]
   },
   {
@@ -67,7 +69,8 @@
       { "item_id": "ak_drum_75rd",           "weight": 0.10 },
       { "item_id": "holosun_hs510c",         "weight": 0.08 },
       { "item_id": "ak74_drop",              "weight": 0.09 },
-      { "item_id": "m4a1_drop",              "weight": 0.07 }
+      { "item_id": "m4a1_drop",              "weight": 0.07 },
+      { "item_id": "mp5_drop",               "weight": 0.03 }
     ]
   },
   {
@@ -89,7 +92,8 @@
       { "item_id": "ak_dtk_1_suppressor",    "weight": 0.14 },
       { "item_id": "ak_drum_75rd",           "weight": 0.10 },
       { "item_id": "m4a1_drop",              "weight": 0.13 },
-      { "item_id": "ak74_drop",              "weight": 0.09 }
+      { "item_id": "ak74_drop",              "weight": 0.09 },
+      { "item_id": "mp5_drop",               "weight": 0.02 }
     ]
   }
 ]

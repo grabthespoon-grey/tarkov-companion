@@ -130,6 +130,17 @@
     "description": "Ultra-compact suppressor for 9mm. Best-in-class sound reduction."
   },
   {
+    "id": "mp5_drop",
+    "name": "MP5",
+    "category": "weapon",
+    "type_id": "mp5",
+    "mods": {},
+    "rarity": "uncommon",
+    "steam_tradeable": false,
+    "base_value": 20000,
+    "description": "Compact submachine gun. Sell if you already have one."
+  },
+  {
     "id": "ak74_drop",
     "name": "AK-74",
     "category": "weapon",
