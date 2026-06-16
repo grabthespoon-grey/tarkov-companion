@@ -11,18 +11,18 @@ const C_RED     = Color(0.80, 0.15, 0.10)
 const C_GREEN   = Color(0.20, 0.70, 0.25)
 
 # ── UI References ──────────────────────────────────────────────────────────
-var _status_label:   Label
-var _level_label:    Label
-var _rubles_label:   Label
-var _efficiency_label: Label
-var _deploy_btn:     Button
-var _raid_panel:     PanelContainer
-var _raid_progress:  ProgressBar
-var _raid_label:     Label
-var _raid_timer_label: Label
-var _location_btns:  Array[Button] = []
-var _equip_bars:     Dictionary = {}
-var _inventory_list: VBoxContainer
+var _status_label:      Label
+var _level_label:       Label
+var _rubles_label:      Label
+var _efficiency_label:  Label
+var _deploy_btn:        Button
+var _raid_panel:        PanelContainer
+var _raid_progress:     ProgressBar
+var _raid_label:        Label
+var _raid_timer_label:  Label
+var _location_btns:     Array[Button] = []
+var _equip_bars:        Dictionary = {}
+var _inventory_list:    VBoxContainer
 var _selected_location: String = "factory"
 var _gun_mod_panel:       Control
 var _gun_mod_slots_vbox:  VBoxContainer
@@ -53,6 +53,7 @@ func _build_ui() -> void:
 	_add_raid_panel(root)
 	_add_inventory_panel(root)
 
+	# Gun mod overlay lives outside the scroll container so it covers everything
 	_gun_mod_panel = _build_gun_mod_panel()
 	add_child(_gun_mod_panel)
 	_gun_mod_panel.hide()
@@ -73,6 +74,7 @@ func _add_header(parent: Control) -> void:
 func _add_operator_panel(parent: Control) -> void:
 	var p = _panel(parent)
 	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 4)
 	p.add_child(vbox)
 
 	var hbox = HBoxContainer.new()
@@ -111,6 +113,7 @@ func _add_equipment_panel(parent: Control) -> void:
 		bar.min_value = 0
 		bar.max_value = 100
 		bar.value = 0
+		bar.show_percentage = false
 		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		bar.custom_minimum_size.y = 16
 		row.add_child(bar)
@@ -138,13 +141,21 @@ func _add_location_panel(parent: Control) -> void:
 	hbox.add_theme_constant_override("separation", 4)
 	vbox.add_child(hbox)
 
+	var first_btn: Button = null
 	for loc in LootSystem.get_all_locations():
+		var loc_id: String = loc.get("id", "")
 		var btn = _button(loc.get("name", "?").split(" ")[0].to_upper(), C_PANEL)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.set_meta("location_id", loc.get("id", ""))
-		btn.pressed.connect(_on_location_selected.bind(loc.get("id", ""), btn))
+		btn.set_meta("location_id", loc_id)
+		btn.pressed.connect(_on_location_selected.bind(loc_id, btn))
 		hbox.add_child(btn)
 		_location_btns.append(btn)
+		if first_btn == null:
+			first_btn = btn
+
+	# Highlight the default selected location on startup
+	if first_btn != null:
+		first_btn.add_theme_stylebox_override("normal", _make_stylebox(C_BORDER, C_ACCENT))
 
 	_deploy_btn = _button("▶  DEPLOY", C_ACCENT)
 	_deploy_btn.pressed.connect(_on_deploy_pressed)
@@ -162,9 +173,11 @@ func _add_raid_panel(parent: Control) -> void:
 
 	var hbox = HBoxContainer.new()
 	vbox.add_child(hbox)
+
 	_raid_label = _label("RAID IN PROGRESS", C_ACCENT, 11)
 	_raid_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hbox.add_child(_raid_label)
+
 	_raid_timer_label = _label("--:--", C_TEXT, 11)
 	hbox.add_child(_raid_timer_label)
 
@@ -172,6 +185,7 @@ func _add_raid_panel(parent: Control) -> void:
 	_raid_progress.min_value = 0.0
 	_raid_progress.max_value = 1.0
 	_raid_progress.value = 0.0
+	_raid_progress.show_percentage = false
 	_raid_progress.custom_minimum_size.y = 20
 	vbox.add_child(_raid_progress)
 
@@ -189,7 +203,7 @@ func _add_inventory_panel(parent: Control) -> void:
 # ── Gun Mod Panel ──────────────────────────────────────────────────────────
 
 func _build_gun_mod_panel() -> Control:
-	# Dark background — click anywhere outside the panel to close
+	# Dark overlay — clicking it closes the panel
 	var overlay = ColorRect.new()
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	overlay.color = Color(0, 0, 0, 0.85)
@@ -198,13 +212,13 @@ func _build_gun_mod_panel() -> Control:
 			_gun_mod_panel.hide()
 	)
 
-	# CenterContainer handles centering without PRESET_CENTER quirks
+	# CenterContainer positions the inner panel without PRESET_CENTER quirks
 	var center = CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_PASS
 	overlay.add_child(center)
 
-	# Actual dialog panel — MOUSE_FILTER_STOP prevents clicks bubbling to overlay
+	# Dialog panel — MOUSE_FILTER_STOP prevents clicks from reaching the overlay
 	var panel = PanelContainer.new()
 	panel.custom_minimum_size = Vector2(440, 460)
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -215,7 +229,6 @@ func _build_gun_mod_panel() -> Control:
 	vbox.add_theme_constant_override("separation", 8)
 	panel.add_child(vbox)
 
-	# Header row with title + close button
 	var hdr = HBoxContainer.new()
 	hdr.add_theme_constant_override("separation", 8)
 	vbox.add_child(hdr)
@@ -232,7 +245,6 @@ func _build_gun_mod_panel() -> Control:
 	close_btn.pressed.connect(func(): _gun_mod_panel.hide())
 	hdr.add_child(close_btn)
 
-	# Body: left = slots, right = stats
 	var body = HSplitContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vbox.add_child(body)
@@ -286,6 +298,9 @@ func _on_operator_returned(_result: Dictionary) -> void:
 	_status_label.add_theme_color_override("font_color", C_GREEN)
 	_raid_panel.hide()
 	_raid_progress.value = 0.0
+	# Level may have changed — refresh header fields
+	var state = GameManager.game_state
+	_level_label.text = "Lv.%d" % state.operator.level
 	_refresh_equipment()
 
 func _on_farm_progress(progress: float, time_remaining: int) -> void:
@@ -312,25 +327,25 @@ func _refresh_equipment() -> void:
 	for slot in _equip_bars:
 		var item = equip.get(slot)
 		var bar: ProgressBar = _equip_bars[slot]["bar"]
-		var lbl: Label = _equip_bars[slot]["label"]
+		var lbl: Label       = _equip_bars[slot]["label"]
 		if item == null:
 			bar.value = 0
 			lbl.text = "EMPTY"
 			lbl.add_theme_color_override("font_color", C_DIM)
 		else:
-			var cond = item.get("condition", 100.0)
+			var cond: float = item.get("condition", 100.0)
 			bar.value = cond
 			lbl.text = EquipmentSystem.get_condition_label(cond)
 			lbl.add_theme_color_override("font_color", EquipmentSystem.get_condition_color(cond))
 
-	var eff = GameManager.get_farming_efficiency()
+	var eff := GameManager.get_farming_efficiency()
 	_efficiency_label.text = "Efficiency: %.0f%%" % (eff * 100.0)
 
 func _refresh_inventory() -> void:
 	for child in _inventory_list.get_children():
 		child.queue_free()
 
-	var inventory = GameManager.game_state.inventory
+	var inventory: Array = GameManager.game_state.inventory
 	if inventory.is_empty():
 		_inventory_list.add_child(_label("No items", C_DIM, 10))
 		return
@@ -344,19 +359,20 @@ func _refresh_inventory() -> void:
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(name_lbl)
 
-		var rarity_color = _rarity_color(item.get("rarity", "common"))
-		var rarity_lbl = _label(item.get("rarity", "").to_upper(), rarity_color, 9)
-		row.add_child(rarity_lbl)
+		var rarity_color := _rarity_color(item.get("rarity", "common"))
+		row.add_child(_label(item.get("rarity", "").to_upper(), rarity_color, 9))
 
+		var captured_item = item
 		var sell_btn = _button("SELL", C_PANEL)
 		sell_btn.custom_minimum_size = Vector2(42, 20)
-		sell_btn.pressed.connect(GameManager.sell_item.bind(item))
+		sell_btn.pressed.connect(func(): GameManager.sell_item(captured_item))
 		row.add_child(sell_btn)
 
 		if item.get("steam_tradeable", false):
+			var def_id: int = item.get("steam_item_def", 0)
 			var trade_btn = _button("TRADE", C_BORDER)
 			trade_btn.custom_minimum_size = Vector2(48, 20)
-			trade_btn.pressed.connect(SteamManager.open_market_listing.bind(item.get("steam_item_def", 0)))
+			trade_btn.pressed.connect(func(): SteamManager.open_market_listing(def_id))
 			row.add_child(trade_btn)
 
 func _refresh_gun_mod_panel() -> void:
@@ -371,6 +387,7 @@ func _refresh_gun_mod_panel() -> void:
 	_gun_mod_slots_vbox.add_child(_label(weapon.get("name", "?").to_upper(), C_ACCENT, 11))
 
 	for slot in GunModSystem.get_available_slots(weapon):
+		var captured_slot: String = slot  # explicit capture to avoid closure bug
 		var row = HBoxContainer.new()
 		row.add_theme_constant_override("separation", 4)
 		_gun_mod_slots_vbox.add_child(row)
@@ -379,15 +396,16 @@ func _refresh_gun_mod_panel() -> void:
 		slot_lbl.custom_minimum_size.x = 80
 		row.add_child(slot_lbl)
 
-		var mods = weapon.get("mods", {})
+		var mods: Dictionary = weapon.get("mods", {})
 		if slot in mods:
 			var mod_name = _label(mods[slot].get("name", "?"), C_TEXT, 9)
 			mod_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(mod_name)
+
 			var det_btn = _button("✕", C_RED)
 			det_btn.custom_minimum_size = Vector2(22, 22)
 			det_btn.pressed.connect(func():
-				GunModSystem.detach_mod(weapon, slot)
+				GunModSystem.detach_mod(weapon, captured_slot)
 				_refresh_gun_mod_panel()
 				_refresh_inventory()
 				_refresh_equipment()
@@ -398,39 +416,42 @@ func _refresh_gun_mod_panel() -> void:
 			empty_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(empty_lbl)
 
-	# Available compatible mods
 	_gun_mod_slots_vbox.add_child(_label("AVAILABLE MODS", C_ACCENT, 10))
-	var compatible = GunModSystem.get_compatible_mods(weapon, GameManager.game_state.inventory)
+	var compatible := GunModSystem.get_compatible_mods(weapon, GameManager.game_state.inventory)
 	if compatible.is_empty():
 		_gun_mod_slots_vbox.add_child(_label("No compatible mods in inventory", C_DIM, 9))
+
 	for mod in compatible:
+		var captured_mod = mod  # explicit capture to avoid closure bug
 		var row = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 4)
 		_gun_mod_slots_vbox.add_child(row)
+
 		var n = _label(mod.get("name", "?"), C_TEXT, 9)
 		n.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(n)
+
 		var att_btn = _button("ATTACH", C_GREEN)
 		att_btn.custom_minimum_size = Vector2(55, 22)
 		att_btn.pressed.connect(func():
-			GunModSystem.attach_mod(weapon, mod)
+			GunModSystem.attach_mod(weapon, captured_mod)
 			_refresh_gun_mod_panel()
 			_refresh_inventory()
 			_refresh_equipment()
 		)
 		row.add_child(att_btn)
 
-	# Stats
 	_gun_mod_stats_vbox.add_child(_label("STATS", C_ACCENT, 11))
-	var stats = GunModSystem.calculate_weapon_stats(weapon)
-	var stat_order = ["damage", "accuracy", "ergonomics", "recoil_vertical", "recoil_horizontal", "fire_rate"]
-	for stat in stat_order:
-		if stat in stats:
-			var row = HBoxContainer.new()
-			_gun_mod_stats_vbox.add_child(row)
-			var k = _label(stat.replace("_", " ").to_upper(), C_DIM, 9)
-			k.custom_minimum_size.x = 90
-			row.add_child(k)
-			row.add_child(_label(str(stats[stat]), C_TEXT, 9))
+	var stats := GunModSystem.calculate_weapon_stats(weapon)
+	for stat in ["damage", "accuracy", "ergonomics", "recoil_vertical", "recoil_horizontal", "fire_rate"]:
+		if stat not in stats:
+			continue
+		var row = HBoxContainer.new()
+		_gun_mod_stats_vbox.add_child(row)
+		var k = _label(stat.replace("_", " ").to_upper(), C_DIM, 9)
+		k.custom_minimum_size.x = 90
+		row.add_child(k)
+		row.add_child(_label(str(stats[stat]), C_TEXT, 9))
 
 # ── UI Helpers ─────────────────────────────────────────────────────────────
 
@@ -450,8 +471,8 @@ func _label(text: String, color: Color, font_size: int) -> Label:
 func _button(text: String, bg: Color) -> Button:
 	var b = Button.new()
 	b.text = text
-	b.add_theme_stylebox_override("normal", _make_stylebox(bg, C_BORDER))
-	b.add_theme_stylebox_override("hover",  _make_stylebox(bg.lightened(0.15), C_ACCENT))
+	b.add_theme_stylebox_override("normal",  _make_stylebox(bg, C_BORDER))
+	b.add_theme_stylebox_override("hover",   _make_stylebox(bg.lightened(0.15), C_ACCENT))
 	b.add_theme_stylebox_override("pressed", _make_stylebox(bg.darkened(0.2), C_ACCENT))
 	b.add_theme_color_override("font_color", C_TEXT)
 	b.add_theme_font_size_override("font_size", 10)
@@ -463,9 +484,9 @@ func _make_stylebox(bg: Color, border: Color) -> StyleBoxFlat:
 	s.border_color = border
 	s.set_border_width_all(1)
 	s.set_content_margin_all(6)
-	s.corner_radius_top_left = 2
-	s.corner_radius_top_right = 2
-	s.corner_radius_bottom_left = 2
+	s.corner_radius_top_left    = 2
+	s.corner_radius_top_right   = 2
+	s.corner_radius_bottom_left  = 2
 	s.corner_radius_bottom_right = 2
 	return s
 
@@ -478,6 +499,6 @@ func _rarity_color(rarity: String) -> Color:
 		_:          return C_DIM
 
 func _fmt_number(n: int) -> String:
-	if n >= 1000000: return "%.1fM" % (n / 1000000.0)
-	if n >= 1000:    return "%.1fk" % (n / 1000.0)
+	if n >= 1_000_000: return "%.1fM" % (n / 1_000_000.0)
+	if n >= 1_000:     return "%.1fk" % (n / 1_000.0)
 	return str(n)

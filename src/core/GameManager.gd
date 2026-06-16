@@ -29,6 +29,11 @@ var game_state: Dictionary = {
 
 func _ready() -> void:
 	TimeManager.farm_completed.connect(_on_farm_completed)
+	# Deferred so all autoload _ready() calls finish before LootSystem data is needed
+	call_deferred("_load_save")
+
+func _load_save() -> void:
+	SaveManager.load_game()
 
 func get_farming_efficiency() -> float:
 	return EquipmentSystem.calculate_efficiency(game_state.equipment)
