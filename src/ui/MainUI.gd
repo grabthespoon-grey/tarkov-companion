@@ -10,6 +10,16 @@ const C_DIM     = Color(0.45, 0.42, 0.35)
 const C_RED     = Color(0.80, 0.15, 0.10)
 const C_GREEN   = Color(0.20, 0.70, 0.25)
 
+const PHASE_LABELS:  Array = ["침투", "탐색", "교전", "루팅", "탈출"]
+const PHASE_DETAILS: Array = ["경계선 돌파 중...", "루팅 포인트 탐색 중...", "적 세력과 교전 중", "아이템 회수 중...", "탈출구로 이동 중..."]
+const PHASE_COLORS:  Array = [Color(0.45, 0.42, 0.35), Color(0.85, 0.82, 0.75), Color(0.80, 0.15, 0.10), Color(0.20, 0.70, 0.25), Color(0.75, 0.55, 0.15)]
+const EVENT_POOL: Dictionary = {
+	"factory": ["스캐브 1명 제거", "발소리 감지 — 동쪽", "기계실 진입", "연기 감지", "적 2명 교전", "창고 A 루팅", "공장 남쪽 구역 진입", "금속 파편 수거"],
+	"customs": ["PMC 흔적 발견", "트럭 주변 수색", "세관 건물 진입", "지붕 저격수 포착", "적 2명 교전 — 제압", "컨테이너 야드 진입", "전파 방해 감지", "탈출 경로 확인"],
+	"woods":   ["수풀 사이 이동", "야영지 흔적 발견", "저격 위협 — 엄폐", "군사 캐시 발견", "안개로 시야 제한", "군사 시설 진입", "드론 소리 감지", "지뢰 우회 탐색"],
+	"lab":     ["보안 게이트 우회", "실험실 구역 진입", "이상 생명체 감지", "전력 차단 구역", "레드 카드 사용", "보안 시스템 교란", "연구 데이터 회수", "냉동 보관실 진입"],
+}
+
 # ── UI References ──────────────────────────────────────────────────────────
 var _status_label:      Label
 var _level_label:       Label
@@ -28,6 +38,12 @@ var _gun_mod_panel:       Control
 var _gun_mod_slots_vbox:  VBoxContainer
 var _gun_mod_stats_vbox:  VBoxContainer
 var _ammo_vbox:           VBoxContainer
+var _raid_phase_label:    Label
+var _raid_phase_detail:   Label
+var _raid_log_vbox:       VBoxContainer
+var _log_tick:            int = 0
+var _log_entries:         Array = []
+var _raid_location_id:    String = ""
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -188,6 +204,22 @@ func _add_raid_panel(parent: Control) -> void:
 	_raid_progress.custom_minimum_size.y = 20
 	vbox.add_child(_raid_progress)
 
+	var phase_row = HBoxContainer.new()
+	phase_row.add_theme_constant_override("separation", 10)
+	vbox.add_child(phase_row)
+
+	_raid_phase_label = _label("침투", C_DIM, 13)
+	_raid_phase_label.custom_minimum_size.x = 40
+	phase_row.add_child(_raid_phase_label)
+
+	_raid_phase_detail = _label("경계선 돌파 중...", C_DIM, 9)
+	_raid_phase_detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	phase_row.add_child(_raid_phase_detail)
+
+	_raid_log_vbox = VBoxContainer.new()
+	_raid_log_vbox.add_theme_constant_override("separation", 2)
+	vbox.add_child(_raid_log_vbox)
+
 func _add_inventory_panel(parent: Control) -> void:
 	var p = _panel(parent)
 	var vbox = VBoxContainer.new()
@@ -286,19 +318,28 @@ func _on_location_selected(loc_id: String, btn: Button) -> void:
 func _on_deploy_pressed() -> void:
 	GameManager.deploy_operator(_selected_location)
 
-func _on_operator_deployed(_loc_id: String) -> void:
+func _on_operator_deployed(loc_id: String) -> void:
 	_deploy_btn.disabled = true
 	_status_label.text = "● ON RAID"
 	_status_label.add_theme_color_override("font_color", C_RED)
 	_raid_panel.show()
-	var loc = LootSystem.get_location(_selected_location)
+	var loc = LootSystem.get_location(loc_id)
 	_raid_label.text = "RAID: %s" % loc.get("name", "Unknown").to_upper()
+	_raid_location_id = loc_id
+	_log_tick = 0
+	_log_entries.clear()
+	for c in _raid_log_vbox.get_children(): c.queue_free()
+	_raid_phase_label.text = PHASE_LABELS[0]
+	_raid_phase_label.add_theme_color_override("font_color", PHASE_COLORS[0])
+	_raid_phase_detail.text = PHASE_DETAILS[0]
+	_raid_phase_detail.add_theme_color_override("font_color", C_DIM)
 
 func _on_operator_returned(_result: Dictionary) -> void:
 	_status_label.text = "● READY"
 	_status_label.add_theme_color_override("font_color", C_GREEN)
 	_raid_panel.hide()
 	_raid_progress.value = 0.0
+	_log_entries.clear()
 	var state = GameManager.game_state
 	_level_label.text = "Lv.%d" % state.operator.level
 	_refresh_equipment()
@@ -310,9 +351,37 @@ func _on_farm_progress(progress: float, time_remaining: int) -> void:
 	var secs: int = time_remaining % 60
 	_raid_timer_label.text = "%02d:%02d" % [mins, secs]
 
+	var phase := _get_phase_index(progress)
+	_raid_phase_label.text = PHASE_LABELS[phase]
+	_raid_phase_label.add_theme_color_override("font_color", PHASE_COLORS[phase])
+	_raid_phase_detail.text = PHASE_DETAILS[phase]
+
+	_log_tick += 1
+	if _log_tick % 3 == 0:
+		_append_log_entry()
+
 func _on_gun_mod_pressed() -> void:
 	_refresh_gun_mod_panel()
 	_gun_mod_panel.show()
+
+func _get_phase_index(progress: float) -> int:
+	if progress < 0.2:  return 0
+	if progress < 0.4:  return 1
+	if progress < 0.65: return 2
+	if progress < 0.85: return 3
+	return 4
+
+func _append_log_entry() -> void:
+	var pool: Array = EVENT_POOL.get(_raid_location_id, [])
+	if pool.is_empty():
+		return
+	var text: String = pool[randi() % pool.size()]
+	_log_entries.insert(0, "[T+%02ds] %s" % [_log_tick, text])
+	if _log_entries.size() > 4:
+		_log_entries.resize(4)
+	for c in _raid_log_vbox.get_children(): c.queue_free()
+	for i in _log_entries.size():
+		_raid_log_vbox.add_child(_label(_log_entries[i], C_TEXT if i == 0 else C_DIM, 9))
 
 # ── Refresh ────────────────────────────────────────────────────────────────
 
