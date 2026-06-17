@@ -45,7 +45,8 @@ func get_time_remaining() -> int:
 	return max(0, int(_farm_duration - _farm_elapsed))
 
 func _on_tick() -> void:
-	AmmoSystem.tick(1.0)
+	# Ammo regen is handled by AmmoSystem's own timer (runs always, not just
+	# during raids), so it's intentionally not ticked here.
 	if not _is_running:
 		return
 	_farm_elapsed += 1.0

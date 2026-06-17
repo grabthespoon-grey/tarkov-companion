@@ -36,6 +36,17 @@ const AMMO_CONFIG: Dictionary = {
 }
 
 var _regen_accum: Dictionary = {"9mm": 0.0, "7.62mm": 0.0, "5.56mm": 0.0}
+var _regen_timer: Timer
+
+func _ready() -> void:
+	# Self-contained regen tick: runs continuously, independent of raids.
+	# (Previously regen was driven by TimeManager's farm timer, which only
+	# runs during a raid — causing a deadlock when ammo ran out while idle.)
+	_regen_timer = Timer.new()
+	_regen_timer.wait_time = 1.0
+	_regen_timer.timeout.connect(func(): tick(1.0))
+	add_child(_regen_timer)
+	_regen_timer.start()
 
 func get_ammo_type_for_weapon(weapon_id: String) -> String:
 	for ammo_type in AMMO_CONFIG:
