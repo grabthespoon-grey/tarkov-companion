@@ -49,6 +49,20 @@ var _result_items_vbox:   VBoxContainer
 var _pending_items:       Array = []
 var _current_loot_result: Dictionary = {}
 var _result_popup_visible: bool = false
+var _market_panel:        Control
+var _market_content_vbox: VBoxContainer
+var _market_refresh_label: Label
+var _market_tab:          String = "browse"
+var _market_browse_btn:   Button
+var _market_listings_btn: Button
+var _market_tick_timer:   Timer
+var _list_dialog:         Control
+var _list_dialog_item:    Dictionary = {}
+var _list_dialog_spin:    SpinBox
+var _list_dialog_fee_lbl: Label
+var _list_dialog_name_lbl: Label
+var _list_dialog_mkt_lbl: Label
+var _market_dyn:          Array = []   # [{lbl, data, kind}] live countdown labels
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -85,6 +99,21 @@ func _build_ui() -> void:
 	add_child(_result_panel)
 	_result_panel.hide()
 
+	_market_panel = _build_market_panel()
+	add_child(_market_panel)
+	_market_panel.hide()
+
+	_list_dialog = _build_list_dialog()
+	add_child(_list_dialog)
+	_list_dialog.hide()
+
+	# Drives live countdowns (refresh timer, listing sale ETA) while market open.
+	_market_tick_timer = Timer.new()
+	_market_tick_timer.wait_time = 1.0
+	_market_tick_timer.timeout.connect(_on_market_tick)
+	add_child(_market_tick_timer)
+	_market_tick_timer.start()
+
 func _add_header(parent: Control) -> void:
 	var hdr = _panel(parent, Color(0.05, 0.05, 0.05))
 	var hbox = HBoxContainer.new()
@@ -94,6 +123,11 @@ func _add_header(parent: Control) -> void:
 	var title = _label("⚔  TARKOV COMPANION", C_ACCENT, 14)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hbox.add_child(title)
+
+	var market_btn = _button("☰ MARKET", C_BORDER)
+	market_btn.custom_minimum_size = Vector2(80, 24)
+	market_btn.pressed.connect(_on_market_pressed)
+	hbox.add_child(market_btn)
 
 	_rubles_label = _label("₽ 0", C_GREEN, 13)
 	hbox.add_child(_rubles_label)
@@ -301,7 +335,16 @@ func _build_gun_mod_panel() -> Control:
 	return overlay
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and _gun_mod_panel.visible:
+	if not event.is_action_pressed("ui_cancel"):
+		return
+	# Close the topmost open overlay (dialog before its parent panel).
+	if _list_dialog.visible:
+		_list_dialog.hide()
+		get_viewport().set_input_as_handled()
+	elif _market_panel.visible:
+		_market_panel.hide()
+		get_viewport().set_input_as_handled()
+	elif _gun_mod_panel.visible:
 		_gun_mod_panel.hide()
 		get_viewport().set_input_as_handled()
 
@@ -318,6 +361,9 @@ func _connect_signals() -> void:
 	GameManager.rubles_changed.connect(func(_v): _refresh_ammo_panel())
 	TimeManager.farm_progress_updated.connect(_on_farm_progress)
 	AmmoSystem.ammo_changed.connect(func(_t, _c): _refresh_ammo_panel())
+	MarketSystem.market_refreshed.connect(_on_market_changed)
+	MarketSystem.listings_changed.connect(_on_market_changed)
+	MarketSystem.listing_sold.connect(_on_listing_sold)
 
 func _on_location_selected(loc_id: String, btn: Button) -> void:
 	_selected_location = loc_id
@@ -625,12 +671,10 @@ func _refresh_inventory() -> void:
 			sell_btn.pressed.connect(func(): GameManager.sell_item(captured_item))
 			row.add_child(sell_btn)
 
-			if item.get("steam_tradeable", false):
-				var def_id: int = item.get("steam_item_def", 0)
-				var trade_btn = _button("TRADE", C_BORDER)
-				trade_btn.custom_minimum_size = Vector2(48, 20)
-				trade_btn.pressed.connect(func(): SteamManager.open_market_listing(def_id))
-				row.add_child(trade_btn)
+			var list_btn = _button("LIST", C_BORDER)
+			list_btn.custom_minimum_size = Vector2(42, 20)
+			list_btn.pressed.connect(func(): _open_list_dialog(captured_item))
+			row.add_child(list_btn)
 
 func _tier_color(tier: int) -> Color:
 	var rarities := ["", "common", "uncommon", "rare", "epic"]
@@ -785,6 +829,298 @@ func _refresh_gun_mod_panel() -> void:
 		fl.custom_minimum_size.x = 90
 		fr.add_child(fl)
 		fr.add_child(_label("-%.0f%%p" % (total_fail_red * 100.0), C_GREEN, 9))
+
+# ── Black Market ─────────────────────────────────────────────────────────────
+
+func _on_market_pressed() -> void:
+	_market_tab = "browse"
+	_refresh_market_panel()
+	_market_panel.show()
+
+func _select_market_tab(tab: String) -> void:
+	_market_tab = tab
+	_refresh_market_panel()
+
+func _on_market_tick() -> void:
+	# Per-second updates: only rewrite countdown text in place. Full row rebuilds
+	# happen via market_refreshed / listings_changed signals, so we avoid freeing
+	# buttons mid-click and resetting scroll every second.
+	if not _market_panel.visible:
+		return
+	if _market_tab == "browse":
+		var rs: int = MarketSystem.get_seconds_to_refresh()
+		_market_refresh_label.text = "다음 갱신  %02d:%02d" % [floori(rs / 60.0), rs % 60]
+	for d in _market_dyn:
+		var lbl: Label = d["lbl"]
+		if not is_instance_valid(lbl):
+			continue
+		lbl.text = _dyn_text(d["kind"], d["data"])
+
+func _dyn_text(kind: String, data: Dictionary) -> String:
+	if kind == "firesale":
+		var left := int(float(data.get("expire", 0.0)) - float(data.get("age", 0.0)))
+		return "급처 %ds" % max(0, left)
+	# kind == "sale"
+	var sell_at: float = float(data.get("sell_at", -1.0))
+	var remain := int(max(0.0, sell_at - float(data.get("elapsed_online", 0.0))))
+	var tag := "급매" if sell_at <= 30.0 else "판매중"
+	return "%s %02d:%02d" % [tag, floori(remain / 60.0), remain % 60]
+
+func _on_market_changed() -> void:
+	if _market_panel.visible:
+		_refresh_market_panel()
+
+func _on_listing_sold(item: Dictionary, price: int) -> void:
+	_notify("✔ %s 판매  ₽%s" % [item.get("name", "?"), _fmt_number(price)], C_GREEN)
+
+func _build_market_panel() -> Control:
+	var overlay = ColorRect.new()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.color = Color(0, 0, 0, 0.85)
+	overlay.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed:
+			_market_panel.hide()
+	)
+
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_PASS
+	overlay.add_child(center)
+
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(440, 500)
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel.add_theme_stylebox_override("panel", _make_stylebox(C_PANEL, C_BORDER))
+	center.add_child(panel)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	panel.add_child(vbox)
+
+	var hdr = HBoxContainer.new()
+	hdr.add_theme_constant_override("separation", 8)
+	vbox.add_child(hdr)
+	var title = _label("BLACK MARKET", C_ACCENT, 13)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hdr.add_child(title)
+	var close_btn = _button("✕", C_RED)
+	close_btn.custom_minimum_size = Vector2(28, 28)
+	close_btn.pressed.connect(func(): _market_panel.hide())
+	hdr.add_child(close_btn)
+
+	var tabs = HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 4)
+	vbox.add_child(tabs)
+	_market_browse_btn = _button("BROWSE", C_PANEL)
+	_market_browse_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_market_browse_btn.pressed.connect(_select_market_tab.bind("browse"))
+	tabs.add_child(_market_browse_btn)
+	_market_listings_btn = _button("MY LISTINGS", C_PANEL)
+	_market_listings_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_market_listings_btn.pressed.connect(_select_market_tab.bind("listings"))
+	tabs.add_child(_market_listings_btn)
+
+	_market_refresh_label = _label("", C_DIM, 9)
+	vbox.add_child(_market_refresh_label)
+
+	var scroll = ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(420, 400)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(scroll)
+
+	_market_content_vbox = VBoxContainer.new()
+	_market_content_vbox.add_theme_constant_override("separation", 4)
+	_market_content_vbox.custom_minimum_size.x = 410
+	scroll.add_child(_market_content_vbox)
+
+	return overlay
+
+func _refresh_market_panel() -> void:
+	if _market_content_vbox == null:
+		return
+	# Highlight the active tab.
+	_market_browse_btn.add_theme_stylebox_override("normal",
+		_make_stylebox(C_BORDER if _market_tab == "browse" else C_PANEL, C_ACCENT if _market_tab == "browse" else C_BORDER))
+	_market_listings_btn.add_theme_stylebox_override("normal",
+		_make_stylebox(C_BORDER if _market_tab == "listings" else C_PANEL, C_ACCENT if _market_tab == "listings" else C_BORDER))
+
+	for c in _market_content_vbox.get_children(): c.queue_free()
+	_market_dyn.clear()
+
+	if _market_tab == "browse":
+		var rs: int = MarketSystem.get_seconds_to_refresh()
+		_market_refresh_label.text = "다음 갱신  %02d:%02d" % [floori(rs / 60.0), rs % 60]
+		_build_browse_rows()
+	else:
+		var my := MarketSystem.get_my_listings()
+		_market_refresh_label.text = "내 매물  %d / %d" % [my.size(), MarketSystem.MAX_LISTINGS]
+		_build_listing_rows(my)
+
+func _build_browse_rows() -> void:
+	var listings := MarketSystem.get_browse_listings()
+	if listings.is_empty():
+		_market_content_vbox.add_child(_label("매물 없음 — 잠시 후 갱신됩니다", C_DIM, 10))
+		return
+	for i in listings.size():
+		var listing: Dictionary = listings[i]
+		var item: Dictionary = listing.get("item", {})
+		var idx := i
+		var row = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 4)
+		_market_content_vbox.add_child(row)
+
+		var name_lbl = _label(item.get("name", "?"), C_TEXT, 10)
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_lbl)
+
+		var tier: int = item.get("tier", 0)
+		if tier >= 1:
+			row.add_child(_label("T%d" % tier, _tier_color(tier), 9))
+			var ql := _quality_label(item.get("quality", "standard"))
+			if not ql.is_empty():
+				row.add_child(_label(ql, _quality_color(item.get("quality", "standard")), 9))
+
+		if listing.get("firesale", false):
+			var fs_lbl = _label(_dyn_text("firesale", listing), C_RED, 9)
+			row.add_child(fs_lbl)
+			_market_dyn.append({"lbl": fs_lbl, "data": listing, "kind": "firesale"})
+
+		var price: int = listing.get("price", 0)
+		var buy_btn = _button("₽%s" % _fmt_number(price), C_PANEL)
+		buy_btn.custom_minimum_size = Vector2(72, 22)
+		buy_btn.disabled = GameManager.game_state.rubles < price
+		buy_btn.pressed.connect(func(): MarketSystem.buy_listing(idx))
+		row.add_child(buy_btn)
+
+func _build_listing_rows(my: Array) -> void:
+	if my.is_empty():
+		_market_content_vbox.add_child(_label("등록한 매물이 없습니다", C_DIM, 10))
+		_market_content_vbox.add_child(_label("인벤토리에서 LIST 버튼으로 등록하세요", C_DIM, 9))
+		return
+	for i in my.size():
+		var L: Dictionary = my[i]
+		var item: Dictionary = L.get("item", {})
+		var idx := i
+		var row = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 4)
+		_market_content_vbox.add_child(row)
+
+		var name_lbl = _label(item.get("name", "?"), C_TEXT, 10)
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_lbl)
+
+		row.add_child(_label("₽%s" % _fmt_number(L.get("asking_price", 0)), C_ACCENT, 9))
+
+		var sell_at: float = float(L.get("sell_at", -1.0))
+		if sell_at < 0.0:
+			row.add_child(_label("미판매(고가)", C_RED, 9))
+		else:
+			var sale_lbl = _label(_dyn_text("sale", L), C_GREEN, 9)
+			row.add_child(sale_lbl)
+			_market_dyn.append({"lbl": sale_lbl, "data": L, "kind": "sale"})
+
+		var cancel_btn = _button("취소", C_PANEL)
+		cancel_btn.custom_minimum_size = Vector2(44, 22)
+		cancel_btn.pressed.connect(func(): MarketSystem.cancel_listing(idx))
+		row.add_child(cancel_btn)
+
+# ── List (sell) dialog ───────────────────────────────────────────────────────
+
+func _open_list_dialog(item: Dictionary) -> void:
+	if MarketSystem.get_my_listings().size() >= MarketSystem.MAX_LISTINGS:
+		_notify("매물 슬롯이 가득 찼습니다 (%d개)" % MarketSystem.MAX_LISTINGS, C_RED)
+		return
+	_list_dialog_item = item
+	var market_price := MarketSystem.get_market_price(item)
+	_list_dialog_name_lbl.text = item.get("name", "?")
+	_list_dialog_mkt_lbl.text = "현재 시세  ₽%s" % _fmt_number(market_price)
+	_list_dialog_spin.max_value = maxi(market_price * 5, 1000)
+	_list_dialog_spin.value = market_price
+	_update_list_fee()
+	_list_dialog.show()
+
+func _update_list_fee() -> void:
+	var asking := int(_list_dialog_spin.value)
+	var fee := MarketSystem.get_listing_fee(asking)
+	_list_dialog_fee_lbl.text = "등록 수수료 ₽%s (선지불·환불 불가)" % _fmt_number(fee)
+
+func _build_list_dialog() -> Control:
+	var overlay = ColorRect.new()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.color = Color(0, 0, 0, 0.9)
+
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_PASS
+	overlay.add_child(center)
+
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(340, 0)
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	panel.add_theme_stylebox_override("panel", _make_stylebox(C_PANEL, C_BORDER))
+	center.add_child(panel)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	panel.add_child(vbox)
+
+	vbox.add_child(_label("거래소 등록", C_ACCENT, 13))
+	_list_dialog_name_lbl = _label("?", C_TEXT, 11)
+	vbox.add_child(_list_dialog_name_lbl)
+	_list_dialog_mkt_lbl = _label("현재 시세  ₽0", C_DIM, 9)
+	vbox.add_child(_list_dialog_mkt_lbl)
+
+	var price_row = HBoxContainer.new()
+	price_row.add_theme_constant_override("separation", 6)
+	vbox.add_child(price_row)
+	price_row.add_child(_label("희망가", C_DIM, 10))
+	_list_dialog_spin = SpinBox.new()
+	_list_dialog_spin.min_value = 1
+	_list_dialog_spin.max_value = 1_000_000
+	_list_dialog_spin.step = 50
+	_list_dialog_spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_list_dialog_spin.value_changed.connect(func(_v): _update_list_fee())
+	price_row.add_child(_list_dialog_spin)
+
+	_list_dialog_fee_lbl = _label("등록 수수료 ₽0", C_DIM, 9)
+	vbox.add_child(_list_dialog_fee_lbl)
+	vbox.add_child(_label("시세보다 싸게 올릴수록 빨리 팔립니다 (최대 5분 내).", C_DIM, 8))
+
+	var btn_row = HBoxContainer.new()
+	btn_row.add_theme_constant_override("separation", 6)
+	vbox.add_child(btn_row)
+	var cancel_btn = _button("취소", C_PANEL)
+	cancel_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cancel_btn.pressed.connect(func(): _list_dialog.hide())
+	btn_row.add_child(cancel_btn)
+	var confirm_btn = _button("등록", C_ACCENT)
+	confirm_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	confirm_btn.pressed.connect(_on_list_confirm)
+	btn_row.add_child(confirm_btn)
+
+	return overlay
+
+func _on_list_confirm() -> void:
+	var asking := int(_list_dialog_spin.value)
+	if MarketSystem.list_item(_list_dialog_item, asking):
+		_list_dialog.hide()
+		_notify("거래소에 등록했습니다", C_GREEN)
+	else:
+		_notify("등록 실패 — 루블 부족 또는 슬롯 초과", C_RED)
+
+func _notify(text: String, color: Color = C_GREEN) -> void:
+	var p = PanelContainer.new()
+	p.add_theme_stylebox_override("panel", _make_stylebox(C_PANEL, color))
+	p.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	p.offset_top = 36
+	p.offset_left = 40
+	p.offset_right = -40
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var lbl = _label(text, color, 11)
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	p.add_child(lbl)
+	add_child(p)
+	get_tree().create_timer(2.5).timeout.connect(p.queue_free)
 
 # ── UI Helpers ─────────────────────────────────────────────────────────────
 

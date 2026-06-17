@@ -112,6 +112,25 @@ func _apply_quality(item: Dictionary) -> void:
 	item["fail_reduction"] = fail_reduction
 	item["base_value"] = roundi(item.get("base_value", 0) * value_mult)
 
+func get_item_pool() -> Array:
+	return _item_pool
+
+# Mods of a given tier, excluding non-tradeable categories (weapon/ammo).
+func get_items_by_tier(tier: int) -> Array:
+	return _item_pool.filter(func(i):
+		return int(i.get("tier", 0)) == tier and i.get("category", "") not in ["weapon", "ammo"]
+	)
+
+# Builds a fresh randomized instance (with quality rolled) for the Black Market.
+func make_market_instance(tier: int) -> Dictionary:
+	var pool := get_items_by_tier(tier)
+	if pool.is_empty():
+		return {}
+	var inst: Dictionary = pool[randi() % pool.size()].duplicate(true)
+	inst["condition"] = randf_range(50.0, 95.0)
+	_apply_quality(inst)
+	return inst
+
 func _roll_from_table(loot_table: Array) -> Dictionary:
 	if loot_table.is_empty():
 		return _random_item()

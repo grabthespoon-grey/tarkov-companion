@@ -36,6 +36,10 @@ var game_state: Dictionary = {
 	"rubles": 5000,
 	"total_raids": 0,
 	"successful_raids": 0,
+	"market": {
+		"index": {},      # { item_id: float }  per-item price index
+		"listings": [],   # player's active Black Market listings
+	},
 }
 
 func _ready() -> void:
@@ -55,6 +59,9 @@ func _load_save() -> void:
 		game_state.equipment["weapon"] = {
 			"type_id": "mp5", "name": "MP5", "condition": 100.0, "mods": {},
 		}
+	# Migrate: market system not in old saves
+	if "market" not in game_state or typeof(game_state["market"]) != TYPE_DICTIONARY:
+		game_state["market"] = {"index": {}, "listings": []}
 
 func get_farming_efficiency() -> float:
 	return EquipmentSystem.calculate_efficiency(game_state.equipment)
