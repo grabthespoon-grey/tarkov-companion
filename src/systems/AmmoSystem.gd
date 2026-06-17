@@ -7,7 +7,7 @@ const AMMO_CONFIG: Dictionary = {
 		"name":             "9x19mm Parabellum",
 		"weapon_id":        "mp5",
 		"buy_cost_per_30":  1500,
-		"regen_per_sec":    0.05,    # 3 rounds/min → full 90 in 30 min
+		"regen_per_sec":    0.3333,  # 1 round / 3 sec → full 90 in 4.5 min
 		"regen_cap":        90,
 		"min_for_raid":     30,
 		"optimal":          90,
@@ -17,7 +17,7 @@ const AMMO_CONFIG: Dictionary = {
 		"name":             "7.62x39mm",
 		"weapon_id":        "ak74",
 		"buy_cost_per_30":  4200,
-		"regen_per_sec":    0.0333,  # 2 rounds/min → full 90 in 45 min
+		"regen_per_sec":    0.3333,  # 1 round / 3 sec → full 90 in 4.5 min
 		"regen_cap":        90,
 		"min_for_raid":     30,
 		"optimal":          90,
@@ -27,7 +27,7 @@ const AMMO_CONFIG: Dictionary = {
 		"name":             "5.56x45mm NATO",
 		"weapon_id":        "m4a1",
 		"buy_cost_per_30":  9000,
-		"regen_per_sec":    0.0167,  # 1 round/min → full 90 in 90 min
+		"regen_per_sec":    0.3333,  # 1 round / 3 sec → full 90 in 4.5 min
 		"regen_cap":        90,
 		"min_for_raid":     30,
 		"optimal":          90,
