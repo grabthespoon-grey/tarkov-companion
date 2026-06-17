@@ -351,6 +351,7 @@ func _unhandled_input(event: InputEvent) -> void:
 # ── Signal Handlers ────────────────────────────────────────────────────────
 
 func _connect_signals() -> void:
+	GameManager.game_loaded.connect(_refresh_all)
 	GameManager.operator_deployed.connect(_on_operator_deployed)
 	GameManager.operator_returned.connect(_on_operator_returned)
 	GameManager.raid_result_pending.connect(_on_raid_result_pending)
@@ -471,14 +472,7 @@ func _refresh_result_panel() -> void:
 				name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				row.add_child(name_lbl)
 
-				var tier: int = item.get("tier", 0)
-				if tier >= 1 and item.get("category", "") != "weapon":
-					row.add_child(_label("T%d" % tier, _tier_color(tier), 9))
-					var ql := _quality_label(item.get("quality", "standard"))
-					if not ql.is_empty():
-						row.add_child(_label(ql, _quality_color(item.get("quality", "standard")), 9))
-				else:
-					row.add_child(_label(item.get("rarity", "").to_upper(), _rarity_color(item.get("rarity", "common")), 9))
+				_add_grade_badges(row, item)
 
 				var sell_value: int = item.get("base_value", 100)
 				var sell_btn = _button("SELL ₽%s" % _fmt_number(sell_value), C_PANEL)
@@ -637,17 +631,7 @@ func _refresh_inventory() -> void:
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(name_lbl)
 
-		var tier: int = item.get("tier", 0)
-		if tier >= 1 and item.get("category", "") != "weapon":
-			var tier_lbl = _label("T%d" % tier, _tier_color(tier), 9)
-			tier_lbl.custom_minimum_size.x = 20
-			row.add_child(tier_lbl)
-			var ql := _quality_label(item.get("quality", "standard"))
-			if not ql.is_empty():
-				row.add_child(_label(ql, _quality_color(item.get("quality", "standard")), 9))
-		else:
-			var rarity_color := _rarity_color(item.get("rarity", "common"))
-			row.add_child(_label(item.get("rarity", "").to_upper(), rarity_color, 9))
+		_add_grade_badges(row, item)
 
 		var captured_item = item
 		if item.get("category") == "weapon":
@@ -671,14 +655,34 @@ func _refresh_inventory() -> void:
 			sell_btn.pressed.connect(func(): GameManager.sell_item(captured_item))
 			row.add_child(sell_btn)
 
-			var list_btn = _button("LIST", C_BORDER)
-			list_btn.custom_minimum_size = Vector2(42, 20)
-			list_btn.pressed.connect(func(): _open_list_dialog(captured_item))
-			row.add_child(list_btn)
-
 func _tier_color(tier: int) -> Color:
 	var rarities := ["", "common", "uncommon", "rare", "epic"]
 	return _rarity_color(rarities[tier] if tier >= 1 and tier <= 4 else "common")
+
+# Tier of an item, deriving from rarity for legacy/untiered instances that
+# predate the tier field (so they don't fall back to an English rarity badge).
+func _effective_tier(item: Dictionary) -> int:
+	var t := int(item.get("tier", 0))
+	if t >= 1:
+		return t
+	match item.get("rarity", ""):
+		"common":   return 1
+		"uncommon": return 2
+		"rare":     return 3
+		"epic":     return 4
+	return 0
+
+# Unified grade display used everywhere: T{tier} + optional Korean quality badge.
+# Keeps inventory / result popup / black market visually consistent (no mixed
+# Korean-quality vs English-rarity labels).
+func _add_grade_badges(row: HBoxContainer, item: Dictionary) -> void:
+	var tier := _effective_tier(item)
+	if tier >= 1:
+		row.add_child(_label("T%d" % tier, _tier_color(tier), 9))
+	var quality: String = item.get("quality", "standard")
+	var ql := _quality_label(quality)
+	if not ql.is_empty():
+		row.add_child(_label(ql, _quality_color(quality), 9))
 
 func _quality_label(quality: String) -> String:
 	match quality:
@@ -722,7 +726,7 @@ func _refresh_gun_mod_panel() -> void:
 			mod_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			row.add_child(mod_name)
 
-			var tier: int = equipped_mod.get("tier", 0)
+			var tier: int = _effective_tier(equipped_mod)
 			var tier_lbl = _label("T%d" % tier, _tier_color(tier), 8)
 			tier_lbl.custom_minimum_size.x = 18
 			row.add_child(tier_lbl)
@@ -763,7 +767,7 @@ func _refresh_gun_mod_panel() -> void:
 		n.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(n)
 
-		var tier: int = mod.get("tier", 0)
+		var tier: int = _effective_tier(mod)
 		var tier_lbl = _label("T%d" % tier, _tier_color(tier), 8)
 		tier_lbl.custom_minimum_size.x = 18
 		row.add_child(tier_lbl)
@@ -799,7 +803,7 @@ func _refresh_gun_mod_panel() -> void:
 		var k = _label(slot.replace("_", " ").to_upper(), C_DIM, 9)
 		k.custom_minimum_size.x = 90
 		row.add_child(k)
-		var tier: int = m.get("tier", 0)
+		var tier: int = _effective_tier(m)
 		var quality: String = m.get("quality", "standard")
 		var tier_str := "T%d" % tier
 		if quality != "standard":
@@ -973,12 +977,7 @@ func _build_browse_rows() -> void:
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(name_lbl)
 
-		var tier: int = item.get("tier", 0)
-		if tier >= 1:
-			row.add_child(_label("T%d" % tier, _tier_color(tier), 9))
-			var ql := _quality_label(item.get("quality", "standard"))
-			if not ql.is_empty():
-				row.add_child(_label(ql, _quality_color(item.get("quality", "standard")), 9))
+		_add_grade_badges(row, item)
 
 		if listing.get("firesale", false):
 			var fs_lbl = _label(_dyn_text("firesale", listing), C_RED, 9)
@@ -993,10 +992,10 @@ func _build_browse_rows() -> void:
 		row.add_child(buy_btn)
 
 func _build_listing_rows(my: Array) -> void:
+	# ── Active listings ──
+	_market_content_vbox.add_child(_label("─ 등록된 매물 ─", C_ACCENT, 9))
 	if my.is_empty():
-		_market_content_vbox.add_child(_label("등록한 매물이 없습니다", C_DIM, 10))
-		_market_content_vbox.add_child(_label("인벤토리에서 LIST 버튼으로 등록하세요", C_DIM, 9))
-		return
+		_market_content_vbox.add_child(_label("등록한 매물이 없습니다", C_DIM, 9))
 	for i in my.size():
 		var L: Dictionary = my[i]
 		var item: Dictionary = L.get("item", {})
@@ -1023,6 +1022,38 @@ func _build_listing_rows(my: Array) -> void:
 		cancel_btn.custom_minimum_size = Vector2(44, 22)
 		cancel_btn.pressed.connect(func(): MarketSystem.cancel_listing(idx))
 		row.add_child(cancel_btn)
+
+	# ── Sellable inventory (list directly from here) ──
+	_market_content_vbox.add_child(HSeparator.new())
+	_market_content_vbox.add_child(_label("─ 등록 가능한 아이템 ─", C_ACCENT, 9))
+	var slots_full: bool = my.size() >= MarketSystem.MAX_LISTINGS
+	if slots_full:
+		_market_content_vbox.add_child(_label("매물 슬롯이 가득 찼습니다 (%d/%d)" % [my.size(), MarketSystem.MAX_LISTINGS], C_RED, 9))
+	var sellable: Array = GameManager.game_state.inventory.filter(func(it):
+		return it is Dictionary and it.get("category", "") != "weapon"
+	)
+	if sellable.is_empty():
+		_market_content_vbox.add_child(_label("인벤토리에 등록할 아이템이 없습니다", C_DIM, 9))
+		return
+	for item in sellable:
+		var captured_item: Dictionary = item
+		var row = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 4)
+		_market_content_vbox.add_child(row)
+
+		var name_lbl = _label(item.get("name", "?"), C_TEXT, 10)
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_lbl)
+
+		_add_grade_badges(row, item)
+
+		row.add_child(_label("시세 ₽%s" % _fmt_number(MarketSystem.get_market_price(item)), C_DIM, 9))
+
+		var list_btn = _button("등록", C_ACCENT)
+		list_btn.custom_minimum_size = Vector2(44, 22)
+		list_btn.disabled = slots_full
+		list_btn.pressed.connect(func(): _open_list_dialog(captured_item))
+		row.add_child(list_btn)
 
 # ── List (sell) dialog ───────────────────────────────────────────────────────
 

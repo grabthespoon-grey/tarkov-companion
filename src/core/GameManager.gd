@@ -6,6 +6,7 @@ signal raid_result_pending(loot_result: Dictionary)
 signal equipment_changed(slot: String)
 signal inventory_changed()
 signal rubles_changed(new_amount: int)
+signal game_loaded()
 
 var _pending_loot_result: Dictionary = {}
 
@@ -62,6 +63,9 @@ func _load_save() -> void:
 	# Migrate: market system not in old saves
 	if "market" not in game_state or typeof(game_state["market"]) != TYPE_DICTIONARY:
 		game_state["market"] = {"index": {}, "listings": []}
+	# Save loads deferred (after MainUI._ready), so notify the UI to repaint with
+	# the loaded state — otherwise panels keep showing the default empty state.
+	emit_signal("game_loaded")
 
 func get_farming_efficiency() -> float:
 	return EquipmentSystem.calculate_efficiency(game_state.equipment)
