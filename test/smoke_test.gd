@@ -23,6 +23,7 @@ func _run() -> void:
 	_test_sale_resolution()
 	_test_cancel_listing()
 	_test_my_listings_render()
+	_test_weapon_swap_preserves_mods()
 
 	print("SMOKE_DONE pass=%d fail=%d" % [_pass, _fail])
 	get_tree().quit(0 if _fail == 0 else 1)
@@ -123,6 +124,49 @@ func _test_my_listings_render() -> void:
 	var btexts := _labels(_ui._market_content_vbox)
 	_check("render: BROWSE tab built (rows or empty note)", btexts.size() >= 0)
 	_ui._market_panel.hide()
+
+func _test_weapon_swap_preserves_mods() -> void:
+	var suppressor := {"id": "supp_t2", "name": "Suppressor", "category": "muzzle",
+		"mod_type": "suppressor", "tier": 2, "efficiency_bonus": 0.05}
+	var bcg := {"id": "bcg_t2", "name": "Enhanced BCG", "category": "bcg",
+		"mod_type": "standard_bcg", "tier": 2, "efficiency_bonus": 0.04}
+	# Outgoing M4A1 carries a muzzle (compatible with MP5) and a bcg (MP5 has no
+	# bcg slot). Swapping to a fresh MP5 should transfer the muzzle and return the
+	# bcg to inventory — nothing lost.
+	var old_weapon := {"type_id": "m4a1", "name": "M4A1", "condition": 100.0,
+		"mods": {"muzzle": suppressor, "bcg": bcg}}
+	var new_mp5 := {"type_id": "mp5", "name": "MP5 (new)", "condition": 100.0,
+		"category": "weapon", "mods": {}}
+	_reset_state(100000, [new_mp5])
+	GameManager.game_state.equipment["weapon"] = old_weapon
+
+	var ok := GameManager.equip_item(new_mp5, "weapon")
+	_check("swap: equip returns true", ok)
+	var equipped: Dictionary = GameManager.game_state.equipment["weapon"]
+	_check("swap: new MP5 equipped", equipped.get("type_id") == "mp5")
+	_check("swap: compatible muzzle transferred to new weapon",
+		equipped.get("mods", {}).get("muzzle", {}).get("id", "") == "supp_t2")
+	_check("swap: incompatible bcg NOT on new weapon",
+		"bcg" not in equipped.get("mods", {}))
+	_check("swap: incompatible bcg returned to inventory as loose item",
+		_inv_has_id("bcg_t2"))
+	_check("swap: old weapon stored with mods cleared",
+		_inv_has_id_bare_weapon("m4a1"))
+	# No mod lost: exactly the muzzle (on weapon) + bcg (loose) survive.
+	_check("swap: no mods lost (muzzle on weapon, bcg loose)",
+		equipped.get("mods", {}).size() == 1 and _inv_has_id("bcg_t2"))
+
+func _inv_has_id(id: String) -> bool:
+	for it in GameManager.game_state.inventory:
+		if it is Dictionary and it.get("id", "") == id:
+			return true
+	return false
+
+func _inv_has_id_bare_weapon(type_id: String) -> bool:
+	for it in GameManager.game_state.inventory:
+		if it is Dictionary and it.get("type_id", "") == type_id:
+			return it.get("mods", {}).is_empty()
+	return false
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 

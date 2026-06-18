@@ -174,6 +174,20 @@ func equip_item(item: Dictionary, slot: String) -> bool:
 		return false
 	var current = game_state.equipment[slot]
 	if current != null:
+		# Preserve the outgoing weapon's mods: move compatible ones onto the new
+		# weapon, return the rest to inventory as loose items. Otherwise the mods
+		# stay buried inside the stored weapon and appear lost (the workshop only
+		# lists top-level inventory mods).
+		if slot == "weapon" and current is Dictionary and current.get("mods") is Dictionary:
+			if "mods" not in item:
+				item["mods"] = {}
+			for mod_slot in current["mods"].keys():
+				var mod = current["mods"][mod_slot]
+				if GunModSystem.can_attach_mod(item, mod) and mod_slot not in item["mods"]:
+					item["mods"][mod_slot] = mod
+				else:
+					game_state.inventory.append(mod)
+			current["mods"] = {}
 		game_state.inventory.append(current)
 	game_state.equipment[slot] = item
 	game_state.inventory.erase(item)
